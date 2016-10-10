@@ -694,24 +694,33 @@
 		</div>
 		<!-- Contact Form -->
 		<article class="container cntme">
-			<form method="post" action="/envato/mywall/one/send-email.php" id="ContactForm" name="ContactForm" class="validate-form">
+			<!--<form action="https://formspree.io/your@email.com"
+				  method="POST">
+				<input type="text" name="name">
+				<input type="email" name="_replyto">
+				<textarea name="message" placeholder="Your message"></textarea>
+				<input type="submit" value="Send">
+			</form>-->
+		
+			<form method="post" action="http://formspree.io/tiagodeluna@hotmail.com" id="ContactForm" name="ContactForm" class="validate-form">
 				<!-- Form inputs -->
 				<div class="row">
 					<div class="form-group col-md-6 col-md-offset-3">
 					  <input type="text" class="form-control ct-name" name="name" id="name" placeholder="Your name" required>
 					</div>
 					<div class="form-group col-md-6 col-md-offset-3">
-					  <input type="email" class="form-control ct-mail" name="email" id="email" placeholder="Email" required>
+					  <input type="email" class="form-control ct-mail" name="_replyto" id="email" placeholder="Email" required>
 					</div>
 					<div class="form-group col-md-6 col-md-offset-3">
-					  <textarea class="form-control ct-message" rows="6" name="message" id="message" placeholder="Write anything here..." required></textarea>
+					  <textarea class="form-control ct-message" rows="6" name="message" id="message" placeholder="Write your message here..." required></textarea>
 					</div>
 				</div>
 				<!-- Button Send -->
 				<div class="row">
 					<div class="form-group col-md-6 col-md-offset-3">
 						<div id="successmsg"></div>
-						<button type="submit" name="button" id="button" class="btn btnc2 with-br btn-ctc"><span>Send Now</span></button>
+						<input type="submit" name="button" id="button" class="btn btnc2 with-br btn-ctc" value="Send Now">
+						<!--<button type="submit" name="button" id="button" class="btn btnc2 with-br btn-ctc"><span>Send Now</span></button>-->
 					</div>
 				</div>
 			</form>
