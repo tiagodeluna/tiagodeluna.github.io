@@ -27,7 +27,7 @@
                 if(validateForm()){
                  e.preventDefault();
                   $.ajax({type: "POST",
-                          url: "http://izee.ro/envato/mywall/one/send-email.php",
+                          url: "http://tiagodeluna.github.io/send-email.php",
                           data:$("#ContactForm").serialize(),
                           success:function(result){
                           $("#successmsg").html(result);
