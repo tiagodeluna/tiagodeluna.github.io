@@ -2,6 +2,14 @@ header {
     background: url(../img/bg_hexagon_texture.jpg) no-repeat center center;
     background-size: cover;
 }
+header.projects {
+    background: url(../img/bg_head_3.png) no-repeat center center;
+	min-height: 0;
+	padding-bottom: 60px;
+}
+header.projects .imgsus {
+    margin-top: 0;
+}
 .button-mywall {
     background: rgba(236, 8, 86, 0);
     border: 2px solid #0CD2A4;
