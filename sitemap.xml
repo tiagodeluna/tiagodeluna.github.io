@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" 
+  xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" 
+  xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
+  <url> 
+    <loc>http://tiagodeluna.github.io</loc> 
+  </url>
+  <url> 
+    <loc>http://tiagodeluna.github.io/projects</loc> 
+	<image:image>
+       <image:loc>http://tiagodeluna.github.io/img/projects/snake.jpg</image:loc>
+       <image:caption>Snake game</image:caption>
+    </image:image>
+	<image:image>
+       <image:loc>http://tiagodeluna.github.io/img/projects/muna_login.png</image:loc>
+       <image:caption>MUNA starting screen</image:caption>
+    </image:image>
+	<image:image>
+       <image:loc>http://tiagodeluna.github.io/img/projects/muna_1.jpg</image:loc>
+       <image:caption>MUNA screenshot 1</image:caption>
+    </image:image>
+	<image:image>
+       <image:loc>http://tiagodeluna.github.io/img/projects/muna_2.jpg</image:loc>
+       <image:caption>MUNA screenshot 2</image:caption>
+    </image:image>
+	<image:image>
+       <image:loc>http://tiagodeluna.github.io/img/projects/muna_3.jpg</image:loc>
+       <image:caption>MUNA screenshot 3</image:caption>
+    </image:image>
+	<image:image>
+       <image:loc>http://tiagodeluna.github.io/img/projects/muna_4.jpg</image:loc>
+       <image:caption>MUNA screenshot 4</image:caption>
+    </image:image>
+	<image:image>
+       <image:loc>http://tiagodeluna.github.io/img/projects/muna_5.jpg</image:loc>
+       <image:caption>MUNA screenshot 5</image:caption>
+    </image:image>
+	<image:image>
+       <image:loc>http://tiagodeluna.github.io/img/projects/muna_6.jpg</image:loc>
+       <image:caption>MUNA screenshot 6</image:caption>
+    </image:image>
+	<image:image>
+       <image:loc>http://tiagodeluna.github.io/img/projects/muna_7.jpg</image:loc>
+       <image:caption>MUNA screenshot 7</image:caption>
+    </image:image>
+  </url>
+</urlset>
