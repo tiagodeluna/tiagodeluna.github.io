@@ -1948,6 +1948,23 @@ h1.jprt-item-title {
   background-color: #2D373D;
   color: #FFFFFF;
 }
+.btn-portfolio {
+  background-color: #2D373D;
+  padding: 20px 40px;
+  border-radius: 50px;
+  font-size: 30px;
+  margin-top: 13px;
+  color: #FFFFFF;
+  font-weight: 300;
+  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+    -webkit-transition: all 0.3s;
+  -moz-transition: all 0.3s;
+  transition: all 0.3s;
+}
+.btn-portfolio:hover, .btn-portfolio:focus {
+  background: #0CD2A4;
+  color: #FFFFFF;
+}
 .social-ink {
   float: left;
   padding: 20px;
@@ -2627,6 +2644,20 @@ h1.jprt-item-title {
     font-size: 30px;
     margin-top: 80px;
     color: #1B1C3E;
+    font-weight: 300;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+    -webkit-transition: all 0.3s;
+    -moz-transition: all 0.3s;
+    transition: all 0.3s;
+    display: inline-block;
+  }
+  .btn-portfolio {
+    background-color: #2D373D;
+    padding: 20px 40px;
+    border-radius: 50px;
+    font-size: 30px;
+    margin-top: 80px;
+    color: #FFFFFF;
     font-weight: 300;
     box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
     -webkit-transition: all 0.3s;
