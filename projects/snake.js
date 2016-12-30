@@ -87,12 +87,16 @@ function setBug() {
 //Game objects
 var canvas, ctx, keystate, frames, score;
 
-function main() {
+function main(id) {
 	canvas = document.createElement("canvas");
 	canvas.width = COLS*20;
 	canvas.height = ROWS*20;
+	canvas.style.zIndex   = 8;
+	canvas.style.position = "absolute";
 	ctx = canvas.getContext("2d");
-	document.body.appendChild(canvas);
+
+	div = document.getElementById(id);
+	div.appendChild(canvas);
 
 	ctx.font = "12px Helvetica";
 	
@@ -200,22 +204,26 @@ function draw() {
 		for (var y=0; y < grid.height; y++) {
 			switch (grid.get(x, y)) {
 				case EMPTY:
-					ctx.fillStyle = "#ffd297";
+					ctx.fillStyle = "#2D373D";
+					//ctx.fillStyle = "#ffd297";
 					break;
 				case SNAKE:
-					ctx.fillStyle = "#46765d";
+					ctx.fillStyle = "#0CD2A4";
+					//ctx.fillStyle = "#46765d";
 					break;
 				case FRUIT:
-					ctx.fillStyle = "#bb3b80";
+					ctx.fillStyle = "#0CE2E4";
+					//ctx.fillStyle = "#bb3b80";
 					break;
 				case BUG:
-					ctx.fillStyle = "#333a76";
+					ctx.fillStyle = "purple";
+					//ctx.fillStyle = "#333a76";
 					break;
 			}
 			
 			ctx.fillRect(x*tw, y*th, tw, th);
 		}
 	}
-	ctx.fillStyle = "#000";
+	ctx.fillStyle = "#FFF";
 	ctx.fillText("SCORE: " + score, 10, canvas.height-10);
 }
