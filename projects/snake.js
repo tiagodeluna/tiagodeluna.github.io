@@ -6,6 +6,8 @@ var EMPTY=0, SNAKE=1, FRUIT=2, BUG=3;
 var LEFT=0, UP=1, RIGHT=2, DOWN=3;
 //KeyCodes
 var KEY_LEFT=37, KEY_UP=38, KEY_RIGHT=39, KEY_DOWN=40;
+//Colors
+var COLOR_EMPTY="#2D373D", COLOR_SNAKE="#0CD2A4", COLOR_FRUIT="#0CE2E4", COLOR_BUG="#990099", COLOR_SCORE="#0EF1BC", COLOR_POISON="#FF1AFF";
 
 var grid = {
 	width: null,
@@ -54,6 +56,10 @@ var snake = {
 	remove: function() {
 		return this._queue.pop();
 	}
+
+//	getSize: function() {
+//		return this._queue.length;
+//	}
 }
 
 function setFood() {
@@ -85,7 +91,7 @@ function setBug() {
 }
 
 //Game objects
-var canvas, ctx, keystate, frames, score;
+var canvas, ctx, keystate, frames, score, poison;
 
 function main(id) {
 	canvas = document.createElement("canvas");
@@ -115,6 +121,7 @@ function main(id) {
 
 function init() {
 	score = 0;
+	poison = 0;
 	grid.init(EMPTY, COLS, ROWS);
 	
 	var sp = {x:Math.floor(COLS/2), y:ROWS-1};
@@ -167,20 +174,24 @@ function update() {
 		if (0 > nx || nx > grid.width-1 ||
 			0 > ny || ny > grid.height-1 ||
 			grid.get(nx, ny) === SNAKE ||
-			score < 0) {
+			poison >= 100) {
 			return init();
 		}
 
 		//Eat bug
 		if (grid.get(nx, ny) === BUG) {
-			score--;
+			var tail = {x:nx, y:ny};
+			score += 5;
+			poison += 20;
 			setBug();
-		}
-
 		//Eat fruit
-		if (grid.get(nx, ny) === FRUIT) {
+		} else if (grid.get(nx, ny) === FRUIT) {
 			var tail = {x:nx, y:ny};
 			score++;
+			poison -= 5;
+			if (poison < 0) {
+				poison = 0;
+			}
 			setFood();
 		}
 		else {
@@ -204,19 +215,24 @@ function draw() {
 		for (var y=0; y < grid.height; y++) {
 			switch (grid.get(x, y)) {
 				case EMPTY:
-					ctx.fillStyle = "#2D373D";
+					ctx.fillStyle = COLOR_EMPTY;
 					//ctx.fillStyle = "#ffd297";
 					break;
 				case SNAKE:
-					ctx.fillStyle = "#0CD2A4";
+					if (Math.random() < poison/100) {
+						ctx.fillStyle = COLOR_BUG;
+					}
+					else {
+						ctx.fillStyle = COLOR_SNAKE;
+					}
 					//ctx.fillStyle = "#46765d";
 					break;
 				case FRUIT:
-					ctx.fillStyle = "#0CE2E4";
+					ctx.fillStyle = COLOR_FRUIT;
 					//ctx.fillStyle = "#bb3b80";
 					break;
 				case BUG:
-					ctx.fillStyle = "purple";
+					ctx.fillStyle = COLOR_BUG;
 					//ctx.fillStyle = "#333a76";
 					break;
 			}
@@ -224,6 +240,8 @@ function draw() {
 			ctx.fillRect(x*tw, y*th, tw, th);
 		}
 	}
-	ctx.fillStyle = "#FFF";
-	ctx.fillText("SCORE: " + score, 10, canvas.height-10);
+	ctx.fillStyle = COLOR_SCORE;
+	ctx.fillText("SCORE: " + score, 10, canvas.height-25);
+	ctx.fillStyle = COLOR_POISON;
+	ctx.fillText("POISON: " + poison + "%", 10, canvas.height-10);
 }
