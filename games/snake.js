@@ -90,10 +90,12 @@ function setBug() {
 
 //Game objects
 var canvas, ctx, keystate, frames, score, poison, menu, hitType,
-	msgsSelf, msgsWall, msgsPoison;
+	msgsSelf, msgsWall, msgsPoison, gameOver = false;
 
 
 function main() {
+	gameOver = false;
+
 	canvas = document.createElement("canvas");
 	canvas.width = COLS*20;
 	canvas.height = ROWS*20;
@@ -155,6 +157,9 @@ function init() {
 }
 
 function loop() {
+	if (gameOver)
+		return;
+
 	update();
 	draw();
 	
@@ -196,17 +201,20 @@ function update() {
 		if (0 > nx || nx > grid.width-1 ||
 			0 > ny || ny > grid.height-1) {
 			hitType = HIT_WALL;
-			gameover();
+			gameOver = true;
+			return gameover();
 		}
 		//Death - Self-Hit
 		else if (grid.get(nx, ny) === SNAKE) {
 			hitType = HIT_SELF;
-			gameover();
+			gameOver = true;
+			return gameover();
 		}
 		//Death - 100% poisoned
 		else if (poison >= 100) {
 			hitType = HIT_POISON;
-			gameover();
+			gameOver = true;
+			return gameover();
 		}
 
 		//Eat bug
