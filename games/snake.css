@@ -1,5 +1,3 @@
-@import url("http://fonts.googleapis.com/css?family=Press+Start+2P");
-
 body {padding: 0; margin: 0; overflow: hidden;}
 canvas {
 	box-shadow: 0 0 20px #000;
@@ -85,21 +83,6 @@ a#tweet {
 	text-decoration: none;
 	margin: 0 auto; 
 }
-
-/*#score {
-	bottom: 10px;
-	position: absolute;
-	z-index: 1;
-	padding-left: 10px;
-	font-size: 16px;
-}
-
-p#loading {
-	border: none;
-	font-size: 16px;
-	top: 20%;
-	width: 200px;
-}*/
 
 #info2 {
 	top: 100%;
