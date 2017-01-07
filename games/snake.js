@@ -257,9 +257,11 @@ function gameover() {
 	function makeTweet() {
 		//Reconfigure Tweet link
 		var tweet = document.getElementById("tweet");
-		tweet.href='http://twitter.com/share?url=http://tiagodeluna.github.io/games/snake I scored ' 
-					+score+ ' points in the HTML5 Toxic Snake game&count=horiztonal&via=tiago_luna';
+		tweet.href='https://twitter.com/home?status=http%3A//tiagodeluna.github.io/games/snake%20I%20scored%20' 
+					+score+ '%20points%20in%20the%20Toxic%20Snake%20game%20via%20%40tiago_luna';
 		tweet.style.top = "35%";
+
+
 	}
 
 	function gameOverText() {
