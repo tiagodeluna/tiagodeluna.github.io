@@ -10,6 +10,11 @@
 
 </IfModule>
 
+<IfModule mod_headers.c>
+    Header unset ETag
+</IfModule>
+FileETag None
+
 <FilesMatch "\.(ico|jpg|jpeg|png|gif|js|css|swf|svg|pdf|flv|mp3)$">
     <IfModule mod_expires.c>
         ExpiresActive on
