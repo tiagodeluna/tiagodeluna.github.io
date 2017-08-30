@@ -1261,11 +1261,17 @@ p.extend-details {
   font-weight: 300;
   text-transform: uppercase;
 }
+.wk-skills {
+  font-size: 18px;
+  font-style: normal;
+  color: #999;
+}
 .wk-date {
     text-align: center;
     color: rgba(255, 255, 255, 0.7);
     font-size: 18px;
     font-weight: 300;
+    padding: 6px 0;
     text-transform: uppercase;
 }
 .fade {
