@@ -40,7 +40,16 @@ var POP = {
         POP.currentWidth = POP.WIDTH;
         POP.currentHeight = POP.HEIGHT;
         // this is our canvas element
-        POP.canvas = document.getElementsByTagName('canvas')[0];
+        POP.canvas = document.createElement("canvas");
+        POP.canvas.style.zIndex = 2;
+        //"Remove" menu and show append our canvas to body
+        var section = document.getElementById('menu-screen');
+//        section.remove();
+        section.style.display = 'none';
+        // Add our new canvas to body
+        var body = document.getElementsByTagName("body")[0];
+        body.appendChild(POP.canvas);
+
         // setting this is important
         // otherwise the browser will
         // default to 320 x 200
@@ -206,7 +215,6 @@ function preloadImages(path, callback) {
     function _preload(asset) {
         asset.img = new Image();
         asset.img.src = asset.path+asset.file;
-//        asset.img.src = 'img/SYM1.png';
 
         asset.img.addEventListener("load", function() {
             _check();
@@ -258,7 +266,7 @@ function fetchJSONFile(path, callback) {
 
 
 /*---------------------------------------------------*/
-/* Window events and methods                         */
+/* Window events and Main function                   */
 /*---------------------------------------------------*/
 
 // Shim layer with setTimeout callback
@@ -274,5 +282,8 @@ window.requestAnimFrame = (function(){
           };
 })();
 
-window.addEventListener('load', POP.init, false);
-window.addEventListener('resize', POP.resize, false);
+function main() {
+    //Start game
+    POP.init();
+    window.addEventListener('resize', POP.resize, false);
+}
