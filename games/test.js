@@ -1,49 +1,36 @@
-// http://paulirish.com/2011/requestanimationframe-for-smart-animating
-// shim layer with setTimeout fallback
-window.requestAnimFrame = (function(){
-  return  window.requestAnimationFrame       || 
-          window.webkitRequestAnimationFrame || 
-          window.mozRequestAnimationFrame    || 
-          window.oRequestAnimationFrame      || 
-          window.msRequestAnimationFrame     || 
-          function( callback ){
-            window.setTimeout(callback, 1000 / 60);
-          };
-})();
-
-// Array with the different items
-var items = [ 
-    {id: 'SYM1'},
-    {id: 'SYM3'},
-    {id: 'SYM4'},
-    {id: 'SYM5'},
-    {id: 'SYM6'},
-    {id: 'SYM7'}
-    ];
+// Array with the different images
+var IMAGES = [];
 
 var IMAGE_HEIGHT = 155;//77;
 var IMAGE_WIDTH = 235;//117;
 var IMAGE_TOP_MARGIN = 12;
 var IMAGE_BOTTOM_MARGIN = 12;
-var IMAGE_X = 70;
+var REEL_LEFT_MARGIN = 70;
+var REEL_TOP_MARGIN = 12;
 var SLOT_HEIGHT = IMAGE_HEIGHT + IMAGE_TOP_MARGIN + IMAGE_BOTTOM_MARGIN; // how many pixels one slot image takes
+//TODO Get the JSON path from the HTML file
+var JSON_PATH = 'https://tiagodeluna.github.io/games/src/images.json';
+//var JSON_PATH = 'src/images.json';
 
-// Main game object
+
+/*---------------------------------------------------*/
+/* Game classes                                      */
+/*---------------------------------------------------*/
+
 var POP = {
-
-    // set up some initial values
-    WIDTH: 960,//480, 
-    HEIGHT:  536,//268,
-    // The elements in the slot machine
-    elements: [],
-    // we'll set the rest of these
-    // in the init function
+    // Set up some initial values
+    WIDTH: 960,//480
+    HEIGHT:  536,//268
+    // These variables will be setted
+    //  in the init function
     RATIO:  null,
     currentWidth:  null,
     currentHeight:  null,
     canvas: null,
     ctx:  null,
     resetOffset: null,
+    // The elements in the slot machine
+    elements: [],
 
     init: function() {
 
@@ -72,31 +59,15 @@ var POP = {
 //        POP.ios = ( POP.ua.indexOf('iphone') > -1 || POP.ua.indexOf('ipad') > -1  ) ? 
 //            true : false;
 
-        // load assets and predraw the reel
-        preloadImages( items, function() {
+        // Load assets and predraw the reel
+        preloadImages(JSON_PATH, function() {
 
-            // images are preloaded
-
-            // draw elements on canvas
-            function _fillCanvasWithItems(items) {
-
-                for (var i = 0 ; i < items.length ; i++) {
-                    var asset = items[i];
-                    POP.ctx.save();
-                    POP.ctx.shadowColor = "rgba(0,0,0,0.5)";
-                    POP.ctx.shadowOffsetX = 5;
-                    POP.ctx.shadowOffsetY = 5;
-                    POP.ctx.shadowBlur = 5;
-                    POP.ctx.drawImage(asset.img, IMAGE_X, i * SLOT_HEIGHT + IMAGE_TOP_MARGIN, IMAGE_WIDTH, IMAGE_HEIGHT);
-                    POP.ctx.drawImage(asset.img, IMAGE_X, (i + items.length) * SLOT_HEIGHT, IMAGE_WIDTH, IMAGE_HEIGHT);
-                    POP.ctx.restore();
-                }
-            }
-            // Draw the canvas with shuffled array
-            POP.elements = items.slice(0);
+            POP.elements = IMAGES.slice(0);
             shuffleArray(POP.elements);
-            _fillCanvasWithItems( POP.elements );
-            POP.resetOffset =  (items.length + 3) * SLOT_HEIGHT;
+            // After images are preloaded
+            //  draw elements on canvas
+            POP.Draw.elements(POP.elements);
+            POP.resetOffset =  (IMAGES.length + 3) * SLOT_HEIGHT + REEL_TOP_MARGIN;
         });
 
         // we're ready to resize
@@ -127,7 +98,7 @@ var POP = {
     // and render
     loop: function() {
 
-        requestAnimFrame( POP.loop );
+        requestAnimFrame(POP.loop);
 
         POP.update();
         POP.render();
@@ -164,7 +135,7 @@ var POP = {
 
 };
 
-// abstracts various canvas operations into
+// Abstracts various canvas operations into
 // standalone functions
 POP.Draw = {
 
@@ -191,15 +162,33 @@ POP.Draw = {
         POP.ctx.fillText(string, x, y);
     },
 
-    image: function(imgpath, x, y, w, h) {
-        var img = new Image();
-        img.src = imgpath;
-        img.onload = function() {
-            POP.ctx.drawImage(img, x, y, w, h);
+    image: function(img, x, y, w, h) {
+        POP.ctx.drawImage(img, x, y, w, h);
+    },
+
+    elements: function(items) {
+        POP.ctx.save();
+        POP.ctx.shadowColor = "rgba(0,0,0,0.5)";
+        POP.ctx.shadowOffsetX = 5;
+        POP.ctx.shadowOffsetY = 5;
+        POP.ctx.shadowBlur = 5;
+
+        for (var i = 0 ; i < items.length ; i++) {
+            var asset = items[i];
+            POP.ctx.drawImage(asset.img, REEL_LEFT_MARGIN, i * SLOT_HEIGHT + REEL_TOP_MARGIN, IMAGE_WIDTH, IMAGE_HEIGHT);
+            POP.ctx.drawImage(asset.img, REEL_LEFT_MARGIN, (i + items.length) * SLOT_HEIGHT + REEL_TOP_MARGIN, IMAGE_WIDTH, IMAGE_HEIGHT);
+            POP.ctx.restore();
         }
+
+        POP.ctx.restore();
     }
 
 };
+
+
+/*---------------------------------------------------*/
+/* Utilitary functions                               */
+/*---------------------------------------------------*/
 
 function shuffleArray(array) {
 
@@ -212,11 +201,11 @@ function shuffleArray(array) {
 }
 
 // Images must be preloaded before they are used to draw into canvas
-function preloadImages(images, callback) {
+function preloadImages(path, callback) {
 
-    function _preload( asset ) {
+    function _preload(asset) {
         asset.img = new Image();
-        asset.img.src = 'img/' + asset.id+'.png';
+        asset.img.src = asset.path+asset.file;
 //        asset.img.src = 'img/SYM1.png';
 
         asset.img.addEventListener("load", function() {
@@ -229,21 +218,61 @@ function preloadImages(images, callback) {
     }
 
     var loadc = 0;
-    function _check( err, id ) {
-        if ( err ) {
-            alert('Failed to load ' + id );
+    function _check(err, id) {
+        if (err) {
+            alert('Failed to load file with id ' + id);
         }
         loadc++;
-        if ( images.length == loadc ) {
+        if (IMAGES.length == loadc) {
             return callback()
         }
     }
 
-    images.forEach(function(asset) {
-        _preload( asset );
+    // Request the JSON file and execute a callback with the parsed result
+    //  once it is available
+    fetchJSONFile(path, function(data){
+        // Read file getting the array of images {id, filename}
+        IMAGES = data.images.image.slice(0);
+
+        // Prepare each image to load
+        IMAGES.forEach(function(asset) {
+            asset.path = data.images.path;
+            _preload(asset);
+        });
     });
 }
 
+function fetchJSONFile(path, callback) {
+    var httpRequest = new XMLHttpRequest();
+    httpRequest.onreadystatechange = function() {
+        if (httpRequest.readyState === 4) { //4 = DONE
+            if (httpRequest.status === 200) { //200 = OK
+                var data = JSON.parse(httpRequest.responseText);
+                if (callback) callback(data);
+            }
+        }
+    };
+    httpRequest.open('GET', path);
+    httpRequest.send();
+}
+
+
+/*---------------------------------------------------*/
+/* Window events and methods                         */
+/*---------------------------------------------------*/
+
+// Shim layer with setTimeout callback
+// From: http://paulirish.com/2011/requestanimationframe-for-smart-animating
+window.requestAnimFrame = (function(){
+  return  window.requestAnimationFrame       || 
+          window.webkitRequestAnimationFrame || 
+          window.mozRequestAnimationFrame    || 
+          window.oRequestAnimationFrame      || 
+          window.msRequestAnimationFrame     || 
+          function( callback ){
+            window.setTimeout(callback, 1000 / 60);
+          };
+})();
 
 window.addEventListener('load', POP.init, false);
 window.addEventListener('resize', POP.resize, false);
