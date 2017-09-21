@@ -1,13 +1,33 @@
 {
-	"images": {
-		"path": "img/",
-		"image": [
-			{"id": "SYM1", "file": "SYM1.png"},
-			{"id": "SYM3", "file": "SYM3.png"},
-			{"id": "SYM4", "file": "SYM4.png"},
-			{"id": "SYM5", "file": "SYM5.png"},
-			{"id": "SYM6", "file": "SYM6.png"},
-			{"id": "SYM7", "file": "SYM7.png"}
-		]
-	}
+   "content":{
+      "path":"img/",
+      "imageList":{
+         "image":[
+            {
+               "id":"SYM1",
+               "file":"SYM1.png"
+            },
+            {
+               "id":"SYM3",
+               "file":"SYM3.png"
+            },
+            {
+               "id":"SYM4",
+               "file":"SYM4.png"
+            },
+            {
+               "id":"SYM5",
+               "file":"SYM5.png"
+            },
+            {
+               "id":"SYM6",
+               "file":"SYM6.png"
+            },
+            {
+               "id":"SYM7",
+               "file":"SYM7.png"
+            }
+         ]
+      }
+   }
 }
