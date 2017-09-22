@@ -13,42 +13,41 @@
 
 <!-- TODO: Create and add a custom favicon -->
 	<link rel="shortcut icon" href="../favicon.png">
-	<link href="https://fonts.googleapis.com/css?family=Press+Start+2P" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css?family=Baloo+Paaji|Chewy" rel="stylesheet">
 	<link rel="stylesheet" type="text/css" href="test.css" />
 </head>
 <body>
-	<section id="menu-screen" class="full-section">
-		<br><br>
-		<div id="game-container">
+	<div id="game-container">
 
-			<div id="menu">
-				<h1 id="game">Wild Fruits</h1>
-				<p id="info">by <a target="_blank" rel="nofollow" href="http://tiagodeluna.github.io">Tiago Luna</a></p>
-				<p id="info2">Game Over</p>
-				<a href="javascript: void(0)" id="start" onclick="main(); return false;" >Start</a>
-<!-- TODO: Implement "Tweet My Score" -->
-				<a href="#" id="tweet" target="_blank" rel="nofollow">Tweet My Score</a> 
-			</div>
+		<div id="menu">
+<!-- TODO: Remove all unnecessary tags -->
+			<h1 id="game">Wild Fruits</h1>
+			<p id="info">by <a target="_blank" rel="nofollow" href="http://tiagodeluna.github.io">Tiago Luna</a></p>
+			<!--<p id="info2">Game Over</p>-->
+			<p id="loading">Loading...</p>
+			<a href="javascript: void(0)" id="start" onclick="play(); return false;" >Start</a>
+<!-- TODO: Implement "Tweet My Score" on Canvas -->
+			<a href="#" id="tweet" target="_blank" rel="nofollow">Tweet My Score</a> 
+		</div>
 
 <!-- TODO: Add sound effects -->
-			<!--
-			<p id="score">Score: 0</p>
-			<!-- Audio ->
-			<audio id="main_music" loop>
-				<source src="http://dl.dropbox.com/u/26141789/canvas/test/main.mp3" type="audio/mp3" />
-				<source src="http://dl.dropbox.com/u/26141789/canvas/test/main.ogg" type="audio/ogg"/>
-			</audio>
-			<audio id="gameOver">
-				<source src="http://dl.dropbox.com/u/26141789/canvas/test/go.mp3" type="audio/mp3" />
-				<source src="http://dl.dropbox.com/u/26141789/canvas/test/go.ogg" type="audio/ogg"/>
-			</audio>
-			<audio id="food">
-				<source src="http://dl.dropbox.com/u/26141789/canvas/test/food.mp3" type="audio/mp3" />
-				<source src="http://dl.dropbox.com/u/26141789/canvas/test/food.ogg" type="audio/ogg"/>
-			</audio>
-				-->
-		</div>
-	</section>
+		<!--
+		<p id="score">Score: 0</p>
+		<!-- Audio ->
+		<audio id="main_music" loop>
+			<source src="http://dl.dropbox.com/u/26141789/canvas/test/main.mp3" type="audio/mp3" />
+			<source src="http://dl.dropbox.com/u/26141789/canvas/test/main.ogg" type="audio/ogg"/>
+		</audio>
+		<audio id="gameOver">
+			<source src="http://dl.dropbox.com/u/26141789/canvas/test/go.mp3" type="audio/mp3" />
+			<source src="http://dl.dropbox.com/u/26141789/canvas/test/go.ogg" type="audio/ogg"/>
+		</audio>
+		<audio id="food">
+			<source src="http://dl.dropbox.com/u/26141789/canvas/test/food.mp3" type="audio/mp3" />
+			<source src="http://dl.dropbox.com/u/26141789/canvas/test/food.ogg" type="audio/ogg"/>
+		</audio>
+			-->
+	</div>
 
 	<script type="text/javascript" src="test.js"></script>
 </body>

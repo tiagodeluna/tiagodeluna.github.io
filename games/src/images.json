@@ -1,6 +1,6 @@
 {
-	"symbols": {
-		"path": "https://github.com/tiagodeluna/tiagodeluna.github.io/raw/master/games/img/",
+	"images": {
+		"path": "img/",
 		"image": [
 			{"id": "SYM1", "file": "SYM1.png"},
 			{"id": "SYM3", "file": "SYM3.png"},
