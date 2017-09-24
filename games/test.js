@@ -119,6 +119,13 @@ var Game = {
             // Fill select element with symbols
             prepareSymbolsForSelection();
 
+            // Display the scores in the main update function
+            Game.Draw.title('Wild Fruits', 100, 80, '#fff');
+//TODO: Draw "by Tiago Luna" with link to my portfolio
+
+            // Create start button
+            Game.Button.create();
+
             if (callback) callback();
         });
 
@@ -599,13 +606,6 @@ function displayCanvas() {
 
 // Hide Loading message and show Start button
 function prepareMenu() {
-    // Display the scores in the main update function
-    Game.Draw.title('Wild Fruits', 80, 60, '#fff');
-//TODO: Draw "by Tiago Luna" with link to my portfolio
-
-    // Create start button
-    Game.Button.create();
-
     // Show canvas
     displayCanvas();
     // we're ready to resize

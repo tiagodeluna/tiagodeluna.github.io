@@ -154,10 +154,10 @@ a#tweet {
     background: white;
     left: 50%;
     top: 50%;
-    height: 260px;
-    width: 320px;
-    margin-left: -185px;
-    margin-top: -180px;
+    height: 220px;
+    width: 280px;
+    margin-left: -175px;
+    margin-top: -160px;
     padding: 15px 10px;
     text-align: center;
 }
