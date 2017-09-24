@@ -1,14 +1,63 @@
-body {padding: 0; margin: 0; overflow: hidden; background: #000; }
-canvas { display: block; margin: 0 auto; background-color: #fff; background:url(img/BG.png); background-size: 100% 100%; z-index: 1; }
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, font, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+dl, dt, dd, ol, ul, li, fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	outline: 0;
+	font-weight: inherit;
+	font-style: inherit;
+	font-size: 100%;
+	font-family: inherit;
+	vertical-align: baseline;
+}
+:focus {
+	outline: 0;
+}
+canvas {
+	display: block;
+	margin: 0 auto;
+	background-color: #fff;
+	background:url(img/BG.png);
+	background-size: 100% 100%;
+	z-index: 1;
+}
+body, #game-container {
+	overflow: hidden;
+}
 
 #game-container {
 	position: absolute;
 	margin: auto;
 	left: 0;
 	right: 0;
-	/*background-color: #2D373D;*/
-	width: 520px;
-	height: 520px;
+	background-color: #2D373D;
+
+	/*overflow: hidden;*/
+    width: 100%;
+    height: 100%;
+    display:block;
+}
+#game-container.mobile {
+    position:absolute;
+    top:0px;
+    left:0px;
+}
+#game-container.tablet {
+    position:absolute;
+    top:0px;
+    left:0px;
+}
+#game-container.desktop {
+    position:fixed;
+    top:0px;
+    left:0px;
+    right:0px;
+    bottom:0px;
 }
 
 #menu {
@@ -20,26 +69,23 @@ canvas { display: block; margin: 0 auto; background-color: #fff; background:url(
 	height: 100%;
 }
 
-#game-container h1, p, a {
-	position: relative;  
-	z-index: 1; 
-	/*font-family: 'Baloo Paaji', cursive;*/
+h1, p, a {
+	position: relative;
+	/*z-index: 1; */
 	font-family: 'Chewy', cursive;
 	color: white;
 	text-align: center;
-	margin: 30px 0 0 0;
 }
 
 h1 {
 	font-size : 48px;
 }
-
+/*
 p {
 	font-size: 20px;
 	margin-top: 10px;
 	padding-left: 200px;
 }
-
 a{
 	font-size : 16px;
 	color: #10C198;
@@ -54,7 +100,7 @@ a:hover {
 
 a#start {
 	font-size: 30px;
-	/*display: block;*/
+	/*display: block;* /
 	display: none;
 	width: 145px;
 	top: 30%;
@@ -74,7 +120,7 @@ a#start:hover {
 
 a#tweet {
 	font-size: 18px;
-	/*display: block;*/
+	/*display: block;* /
 	display: none;
 	top: 100%;
 	left: 0; 
@@ -82,17 +128,15 @@ a#tweet {
 	text-decoration: none;
 	margin: 0 auto; 
 }
-
+*/
 #loading {
-	font-size: 30px;
-	display: block;
-	width: 145px;
-	top: 30%;
-	left: 0; 
 	color: white;
-	padding: 10px;
-	text-decoration: none;
+	display: block;
+	font-size: 30px;
+	left: 0; 
 	margin: 0 auto; 
+	text-decoration: none;
+	top: 50%;
 }
 
 
@@ -100,3 +144,58 @@ a#tweet {
 	top: 100%;
 	padding : 0;
 }
+
+#selection-box {
+    display: none;
+    position: absolute;
+    border-color: gold;
+    border-radius: 25px;
+    border-style: solid;
+    border-width: 10px;
+    background: white;
+    left: 50%;
+    top: 50%;
+    height: 320px;
+    width: 320px;
+    margin-left: -185px;
+    margin-top: -180px;
+    padding: 20px 10px;
+    text-align: center;
+}
+#selection-box p, #symbol-select {
+	color: #000;
+	font-size: 36px;
+	font-family: 'Chewy', cursive;
+}
+#symbol-display, #symbol-select {
+	margin-top: 30px;
+}
+#symbol-display {
+    display: block;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    height: 155px;
+    width: 235px;
+    margin-left: -120px;
+    margin-top: -50px;
+    border-color: green;
+    border-radius: 20px;
+    border-style: solid;
+    border-width: 5px;
+}
+#symbol-display img {
+	display: none;
+    height: 155px;
+    width: 235px;
+}
+
+/*
+#selection-box #score {
+    margin: 5px;
+}
+
+#selection-box #score img {
+    vertical-align: middle;
+}
+*/

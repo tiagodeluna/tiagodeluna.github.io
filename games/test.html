@@ -18,16 +18,24 @@
 </head>
 <body>
 	<div id="game-container">
-
 		<div id="menu">
 <!-- TODO: Remove all unnecessary tags -->
-			<h1 id="game">Wild Fruits</h1>
-			<p id="info">by <a target="_blank" rel="nofollow" href="http://tiagodeluna.github.io">Tiago Luna</a></p>
-			<!--<p id="info2">Game Over</p>-->
+			<!--<h1 id="game">Wild Fruits</h1>-->
+			<!--<p id="info">by <a target="_blank" rel="nofollow" href="http://tiagodeluna.github.io">Tiago Luna</a></p>-->
 			<p id="loading">Loading...</p>
-			<a href="javascript: void(0)" id="start" onclick="play(); return false;" >Start</a>
+
+			<!-- Selection box -->
+			<div id="selection-box">
+				<!--<p>Select a symbol:</p>-->
+				<select id="symbol-select">
+					<option>&lt;choose a symbol&gt;</option>
+				</select>
+				<div id="symbol-display"><img id="symbol-img" src="img/SYM1.png" /></div>
+			</div>
+
+			<!--<a href="javascript: void(0)" id="start" onclick="play(); return false;" >Start</a>-->
 <!-- TODO: Implement "Tweet My Score" on Canvas -->
-			<a href="#" id="tweet" target="_blank" rel="nofollow">Tweet My Score</a> 
+			<!--<a href="#" id="tweet" target="_blank" rel="nofollow">Tweet My Score</a>-->
 		</div>
 
 <!-- TODO: Add sound effects -->

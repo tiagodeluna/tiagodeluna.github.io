@@ -15,17 +15,16 @@ var IMAGE_TOP_MARGIN = 12;
 var IMAGE_BOTTOM_MARGIN = 12;
 var REEL_LEFT_MARGIN = 70;
 var REEL_TOP_MARGIN = 12;
+var SLOT_SPEED = 15; // how many pixels per second slots roll
 var SLOT_HEIGHT = IMAGE_HEIGHT + IMAGE_TOP_MARGIN + IMAGE_BOTTOM_MARGIN; // how many pixels one slot image takes
-//TODO: Get the JSON path from the HTML file
 var JSON_PATH = 'https://tiagodeluna.github.io/games/src/images.json';
-//var JSON_PATH = 'src/images.json';
 
 
 /*---------------------------------------------------*/
 /* Game classes                                      */
 /*---------------------------------------------------*/
 
-var POP = {
+var Game = {
     // Set up some initial values
     WIDTH: 960,//480
     HEIGHT:  536,//268
@@ -45,55 +44,51 @@ var POP = {
     // The elements in the slot machine
     elements: [],
     startBtn: null,
+    selectedSymbol: null,
 
     init: function(callback) {
 
         // the proportion of width to height
-        POP.RATIO = POP.WIDTH / POP.HEIGHT;
+        Game.RATIO = Game.WIDTH / Game.HEIGHT;
         // these will change when the screen is resized
-        POP.currentWidth = POP.WIDTH;
-        POP.currentHeight = POP.HEIGHT;
+        Game.currentWidth = Game.WIDTH;
+        Game.currentHeight = Game.HEIGHT;
         // this is our canvas element
-        POP.canvas = document.createElement("canvas");
-        POP.canvas.style.zIndex = 2;
+        Game.canvas = document.createElement("canvas");
+        Game.canvas.style.zIndex = 2;
 
         // setting this is important
         // otherwise the browser will
         // default to 320 x 200
-        POP.canvas.width = POP.WIDTH;
-        POP.canvas.height = POP.HEIGHT;
+        Game.canvas.width = Game.WIDTH;
+        Game.canvas.height = Game.HEIGHT;
         // the canvas context enables us to 
         // interact with the canvas api
-        POP.ctx = POP.canvas.getContext('2d');
+        Game.ctx = Game.canvas.getContext('2d');
 
         // we need to sniff out Android and iOS
         // so that we can hide the address bar in
         // our resize function
 //TODO: TESTAR O IMPACTO DESSE CODIGO (OU DA AUSENCIA DELE) NO CELULAR
-        POP.ua = navigator.userAgent.toLowerCase();
-        POP.android = POP.ua.indexOf('android') > -1 ? true : false;
-        POP.ios = ( POP.ua.indexOf('iphone') > -1 || POP.ua.indexOf('ipad') > -1  ) ? 
+        Game.ua = navigator.userAgent.toLowerCase();
+        Game.android = Game.ua.indexOf('android') > -1 ? true : false;
+        Game.ios = ( Game.ua.indexOf('iphone') > -1 || Game.ua.indexOf('ipad') > -1  ) ? 
             true : false;
 
-        // listen for clicks
+        // Listen for clicks
         window.addEventListener('click', function(e) {
             e.preventDefault();
-            POP.Input.set(e);
+            Game.Input.set(e);
         }, false);
 
-        // listen for touches
+        // Listen for touches
         window.addEventListener('touchstart', function(e) {
             e.preventDefault();
-            // the event object has an array
-            // named touches; we just want
-            // the first touch
-            POP.Input.set(e.touches[0]);
+            Game.Input.set(e.touches[0]);
         }, false);
         window.addEventListener('touchmove', function(e) {
-            // we're not interested in this,
-            // but prevent default behaviour
-            // so the screen doesn't scroll
-            // or zoom
+            // We're just preventing default behaviour
+            //  so the screen doesn't scroll or zoom
             e.preventDefault();
         }, false);
         window.addEventListener('touchend', function(e) {
@@ -103,9 +98,12 @@ var POP = {
 
         // Load assets and predraw the reel
         preloadImages(JSON_PATH, function() {
-            POP.elements = IMAGES.slice(0);
-            shuffleArray(POP.elements);
-            POP.resetOffset =  (IMAGES.length + 3) * SLOT_HEIGHT + REEL_TOP_MARGIN;
+            Game.elements = IMAGES.slice(0);
+            shuffleArray(Game.elements);
+            Game.resetOffset =  (IMAGES.length + 3) * SLOT_HEIGHT + REEL_TOP_MARGIN;
+
+            // Fill select element with symbols
+            prepareSymbolsForSelection();
 
             if (callback) callback();
         });
@@ -119,15 +117,15 @@ var POP = {
 
         console.log('UPDATE!');
 
-        if (POP.Input.tapped) {
-            POP.Input.tapped = false;
+        if (Game.Input.tapped) {
+            Game.Input.tapped = false;
             checkCollision = true;
         }
 
         // Checks collision
-        if (checkCollision && POP.collides(POP.Button, {x: POP.Input.x, y: POP.Input.y, r: 7}) ) {
+        if (checkCollision && Game.collides(Game.Button, {x: Game.Input.x, y: Game.Input.y, r: 7}) ) {
                 console.log('Colision!');
-                POP.status = GameStatus.SYMBOL_SELECTION;
+                Game.status = GameStatus.SYMBOL_SELECTION;
                 checkCollision = false;
             }
     },
@@ -135,15 +133,20 @@ var POP = {
     // this is where we draw all the entities
     render: function() {
 
-        if (POP.status != GameStatus.NOT_STARTED) {
-            POP.Draw.clear();
+        if (Game.status != GameStatus.NOT_STARTED) {
+            Game.Draw.clear();
 
             // Draw elements on canvas
-            POP.Draw.elements(POP.elements);
+            Game.Draw.elements(Game.elements);
+        }
+
+        if (Game.status === GameStatus.SYMBOL_SELECTION) {
+            var selectionBox = document.getElementById('selection-box');
+            selectionBox.style.display = 'block';
         }
 
         // Draw the background
-        //POP.Draw.image('img/BG.png',0,0,POP.WIDTH,POP.HEIGHT);
+        //Game.Draw.image('img/BG.png',0,0,Game.WIDTH,Game.HEIGHT);
     },
 
     // the actual loop
@@ -152,40 +155,40 @@ var POP = {
     // and render
     loop: function() {
 
-        requestAnimFrame(POP.loop);
+        requestAnimFrame(Game.loop);
 
-        POP.update();
-        POP.render();
+        Game.update();
+        Game.render();
     },
 
     resize: function() {
 
-        POP.currentHeight = window.innerHeight;
+        Game.currentHeight = window.innerHeight;
         // resize the width in proportion
         // to the new height
-        POP.currentWidth = POP.currentHeight * POP.RATIO;
+        Game.currentWidth = Game.currentHeight * Game.RATIO;
 
         // this will create some extra space on the
         // page, enabling us to scroll past
         // the address bar, thus hiding it.
 //TODO: TESTAR O IMPACTO DESSE CODIGO (OU DA AUSENCIA DELE) NO CELULAR
-        if (POP.android || POP.ios) {
+        if (Game.android || Game.ios) {
             document.body.style.height = (window.innerHeight + 50) + 'px';
         }
 
         // set the new canvas style width and height
         // note: our canvas is still 320 x 480, but
         // we're essentially scaling it with CSS
-        POP.canvas.style.width = POP.currentWidth + 'px';
-        POP.canvas.style.height = POP.currentHeight + 'px';
+        Game.canvas.style.width = Game.currentWidth + 'px';
+        Game.canvas.style.height = Game.currentHeight + 'px';
 
         // The amount by which the css resized canvas
         // is different to the actual (480x320) size.
-        POP.scale = POP.currentWidth / POP.WIDTH;
+        Game.scale = Game.currentWidth / Game.WIDTH;
         // Position of canvas in relation to
         // the screen
-        POP.offset.top = POP.canvas.offsetTop;
-        POP.offset.left = POP.canvas.offsetLeft;
+        Game.offset.top = Game.canvas.offsetTop;
+        Game.offset.left = Game.canvas.offsetLeft;
 
         // we use a timeout here because some mobile
         // browsers don't fire if there is not
@@ -193,12 +196,45 @@ var POP = {
         window.setTimeout(function() {
                 window.scrollTo(0,1);
         }, 1);
+    },
+
+    restart: function() {
+        //Game.lastUpdate = new Date();
+        Game.speed1 = SLOT_SPEED;
+
+        // function locates id from items
+        function _find(items, id) {
+            for ( var i=0; i < items.length; i++ ) {
+                if ( items[i].id == id ) return i;
+            }
+        }
+
+        // uncomment to get always jackpot
+        //this.result1 = _find( this.items1, 'gold-64' );
+        //this.result2 = _find( this.items2, 'gold-64' );
+        //this.result3 = _find( this.items3, 'gold-64' );
+
+        // get random results
+        Game.result1 = parseInt(Math.random() * Game.elements.length)
+
+        // Clear stop locations
+        Game.stopped1 = false;
+
+//TODO: PAREI AQUI!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        // randomize reel locations
+        this.offset1 = -parseInt(Math.random( ITEM_COUNT )) * SLOT_HEIGHT;
+        this.offset2 = -parseInt(Math.random( ITEM_COUNT )) * SLOT_HEIGHT;
+        this.offset3 = -parseInt(Math.random( ITEM_COUNT )) * SLOT_HEIGHT;
+
+        $('#results').hide();
+
+        this.state = 1;
     }
 
 };
 
 // this function checks if two circles overlap
-POP.collides = function(a, b) {
+Game.collides = function(a, b) {
 
     /*
     var distance_squared = ( ((a.x - b.x) * (a.x - b.x)) + 
@@ -214,8 +250,8 @@ POP.collides = function(a, b) {
     }
     */
 
-    console.log('Button: x='+POP.Button.x+', y='+POP.Button.y);
-    console.log('Input: x='+POP.Input.x+', y='+POP.Input.y);
+    console.log('Button: x='+Game.Button.x+', y='+Game.Button.y);
+    console.log('Input: x='+Game.Input.x+', y='+Game.Input.y);
 
     if (b.x >= a.x && b.x <= (a.x+a.WIDTH)
         && b.y >= a.y && b.y <= (a.y+a.WIDTH)) {
@@ -226,109 +262,108 @@ POP.collides = function(a, b) {
 };
 
 // Represents an user input (by touch or click)
-POP.Input = {
+Game.Input = {
     x: 0,
     y: 0,
     tapped :false,
 
     set: function(data) {
         //Get the input position considering the offset and scale
-        this.x = (data.pageX - POP.offset.left) / POP.scale;
-        this.y = (data.pageY - POP.offset.top) / POP.scale;
+        this.x = (data.pageX - Game.offset.left) / Game.scale;
+        this.y = (data.pageY - Game.offset.top) / Game.scale;
 
         this.tapped = true; 
     }
 };
 
 
-POP.Button = {
+Game.Button = {
     WIDTH: 300,
     HEIGHT: 96,
     x: 0,
     y: 0,
-    caminho: 'img/start-button.png',
+    src: 'img/start-button.png',
     img: null,
 
     create: function() {
         console.log('Drawing button!')
 
-        this.x = POP.WIDTH/2 - this.WIDTH/2;
-        this.y = POP.HEIGHT/2 - this.HEIGHT/2;
+        this.x = Game.WIDTH/2 - this.WIDTH/2;
+        this.y = Game.HEIGHT/2 - this.HEIGHT/2;
 
         //Draw Start Button
-        POP.Draw.image(this.caminho, this.x, this.y, this.WIDTH, this.HEIGHT);
+        Game.Draw.image(this.src, this.x, this.y, this.WIDTH, this.HEIGHT);
     },
 };
 
 // Abstracts various canvas operations into
 // standalone functions
-POP.Draw = {
+Game.Draw = {
 
     clear: function() {
-        POP.ctx.clearRect(0, 0, POP.WIDTH, POP.HEIGHT);
+        Game.ctx.clearRect(0, 0, Game.WIDTH, Game.HEIGHT);
     },
 
     rect: function(x, y, w, h, color) {
-        POP.ctx.fillStyle = color;
-        POP.ctx.fillRect(x, y, w, h);
+        Game.ctx.fillStyle = color;
+        Game.ctx.fillRect(x, y, w, h);
     },
 
     circle: function(x, y, r, col) {
-        POP.ctx.fillStyle = col;
-        POP.ctx.beginPath();
-        POP.ctx.arc(x + 5, y + 5, r, 0,  Math.PI * 2, true);
-        POP.ctx.closePath();
-        POP.ctx.fill();
+        Game.ctx.fillStyle = col;
+        Game.ctx.beginPath();
+        Game.ctx.arc(x + 5, y + 5, r, 0,  Math.PI * 2, true);
+        Game.ctx.closePath();
+        Game.ctx.fill();
     },
 
     text: function(string, x, y, size, color) {
-        POP.ctx.font = 'bold '+size+'px Chewy';
-        POP.ctx.fillStyle = color;
-        POP.ctx.fillText(string, x, y);
+        Game.ctx.font = 'bold '+size+'px Chewy';
+        Game.ctx.fillStyle = color;
+        Game.ctx.fillText(string, x, y);
     },
 
     title: function(string, y, size, color) {
-        POP.ctx.font = size+'px Chewy';
-        POP.ctx.fillStyle = color;
+        Game.ctx.font = size+'px Chewy';
+        Game.ctx.fillStyle = color;
 
         // Get the width of the text to draw
-        var textWidth = POP.ctx.measureText(string).width;
+        var textWidth = Game.ctx.measureText(string).width;
 
-        POP.ctx.fillText(string, (POP.WIDTH/2) - (textWidth/2), y);
+        Game.ctx.fillText(string, (Game.WIDTH/2) - (textWidth/2), y);
     },
 
     image: function(path, x, y, w, h) {
-        POP.Button.img = new Image();
-        POP.Button.img.src = path;
+        Game.Button.img = new Image();
+        Game.Button.img.src = path;
 
-        POP.Button.img.onload = function() {
-            POP.ctx.save();
-            POP.ctx.shadowColor = "rgba(0,0,0,0.5)";
-            POP.ctx.shadowOffsetX = 5;
-            POP.ctx.shadowOffsetY = 5;
-            POP.ctx.shadowBlur = 5;
-            POP.ctx.drawImage(POP.Button.img, x, y, w, h);
-            POP.ctx.restore();
+        Game.Button.img.onload = function() {
+            Game.ctx.save();
+            Game.ctx.shadowColor = "rgba(0,0,0,0.5)";
+            Game.ctx.shadowOffsetX = 5;
+            Game.ctx.shadowOffsetY = 5;
+            Game.ctx.shadowBlur = 5;
+            Game.ctx.drawImage(Game.Button.img, x, y, w, h);
+            Game.ctx.restore();
         };
-
     },
 
     elements: function(items) {
-        POP.ctx.save();
-        POP.ctx.shadowColor = "rgba(0,0,0,0.5)";
-        POP.ctx.shadowOffsetX = 5;
-        POP.ctx.shadowOffsetY = 5;
-        POP.ctx.shadowBlur = 5;
+        Game.ctx.save();
+        Game.ctx.shadowColor = "rgba(0,0,0,0.5)";
+        Game.ctx.shadowOffsetX = 5;
+        Game.ctx.shadowOffsetY = 5;
+        Game.ctx.shadowBlur = 5;
 
         console.log('Drawing elements!');
 
         for (var i = 0 ; i < items.length ; i++) {
             var asset = items[i];
-            POP.ctx.drawImage(asset.img, REEL_LEFT_MARGIN, i * SLOT_HEIGHT + REEL_TOP_MARGIN, IMAGE_WIDTH, IMAGE_HEIGHT);
-            POP.ctx.drawImage(asset.img, REEL_LEFT_MARGIN, (i + items.length) * SLOT_HEIGHT + REEL_TOP_MARGIN, IMAGE_WIDTH, IMAGE_HEIGHT);
+            Game.ctx.drawImage(asset.img, REEL_LEFT_MARGIN, i * SLOT_HEIGHT + REEL_TOP_MARGIN, IMAGE_WIDTH, IMAGE_HEIGHT);
+            Game.ctx.drawImage(asset.img, REEL_LEFT_MARGIN, (i + items.length) * SLOT_HEIGHT + REEL_TOP_MARGIN, IMAGE_WIDTH, IMAGE_HEIGHT);
         }
 
-        POP.ctx.restore();
+        Game.ctx.restore();
     }
 
 };
@@ -381,8 +416,8 @@ function preloadImages(path, callback) {
         // Read file getting the array of images {id, filename}
         IMAGES = data.symbols.image.slice(0);
 
-        // Prepare each image to load
         IMAGES.forEach(function(asset) {
+            // Prepare each image to load
             asset.path = data.symbols.path;
             _preload(asset);
         });
@@ -403,32 +438,79 @@ function fetchJSONFile(path, callback) {
     httpRequest.send();
 }
 
+function prepareSymbolsForSelection() {
+    var select = document.getElementById('symbol-select');
+
+    IMAGES.forEach(function(asset) {
+       //Fill <select> with the symbols
+        var el = document.createElement('option');
+        el.textContent = asset.name;
+        el.value = asset.id;
+        select.appendChild(el);
+    });
+
+    select.addEventListener('change', selectSymbol);
+}
+
+function selectSymbol() {
+    var value = this.value;
+
+    function _symbolById(symbol) {
+        return symbol.id === value;
+    }
+
+    // Store selected symbol
+    Game.selectedSymbol = IMAGES.find(_symbolById);
+
+    var symbolElement = document.getElementById('symbol-img');
+
+    if (Game.selectedSymbol != null) {
+        // Show selected image
+        symbolElement.src = Game.selectedSymbol.path+Game.selectedSymbol.file;
+        symbolElement.style.display = 'block';
+//TODO: Enable Spin button
+    } else {
+        // Hide image element if no symbol was chosen
+        symbolElement.style.display = 'none';
+    }
+}
+
 // Hide loading screen and show Canvas
 function displayCanvas() {
     console.log('Showing canvas!');
-
+/*
     var loading = document.getElementById('game-container');
 //    loading.remove();
     loading.style.display = 'none';
     // Add our canvas to body
     var body = document.getElementsByTagName("body")[0];
-    body.appendChild(POP.canvas);
+    body.appendChild(Game.canvas);
+*/
+    var loading = document.getElementById('loading');
+    loading.style.display = 'none';
+//    var menu = document.getElementById('menu');
+//    menu.style.display = 'none';
+    // Add our canvas to body
+    var gameContainer = document.getElementById('game-container');
+    gameContainer.appendChild(Game.canvas);
 }
 
 // Hide Loading message and show Start button
 function prepareMenu() {
     // Display the scores in the main update function
-    POP.Draw.title('Wild Fruits', 80, 60, '#fff');
+    Game.Draw.title('Wild Fruits', 80, 60, '#fff');
+//TODO: Draw "by Tiago Luna" with link to my portfolio
+
     // Create start button
-    POP.Button.create();
+    Game.Button.create();
 
     // Show canvas
     displayCanvas();
     // we're ready to resize
-    POP.resize();
+    Game.resize();
 
     // It will then repeat continuously
-    POP.loop();
+    Game.loop();
 }
 
 
@@ -451,7 +533,7 @@ window.requestAnimFrame = (function(){
 
 // Load game elements then show the start screen
 window.addEventListener('load', function() {
-    POP.init(prepareMenu);
+    Game.init(prepareMenu);
 }, false);
 
-window.addEventListener('resize', POP.resize, false);
+window.addEventListener('resize', Game.resize, false);
