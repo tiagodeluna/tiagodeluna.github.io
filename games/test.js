@@ -5,18 +5,27 @@ var IMAGES = [];
 var GameStatus = {
   NOT_STARTED: 1,
   SYMBOL_SELECTION: 2,
-  WON: 3,
-  LOST: 4
+  SWITCH_PHASE_SPINNING: 3,
+  SWITCH_PHASE_STOPPING: 4,
+  SWITCH_PHASE_STOPPED: 5,
+  CALCULATING_RESULT: 6,
+  RESULT_WON: 7,
+  RESULT_LOST: 8
 };
 
 var IMAGE_HEIGHT = 155;
 var IMAGE_WIDTH = 235;
 var IMAGE_TOP_MARGIN = 12;
 var IMAGE_BOTTOM_MARGIN = 12;
-var REEL_LEFT_MARGIN = 70;
+var REEL_LEFT_MARGIN = 310;
 var REEL_TOP_MARGIN = 12;
-var SLOT_SPEED = 15; // how many pixels per second slots roll
+var RUNTIME = 3000; // how long all slots spin before starting countdown
+var SPINTIME = 1000; // how long the slot spins at minimum
+var HIGH_SPEED = 15;//15 // how many pixels per second slots roll
+var LOW_SPEED = 5;
+var DRAW_OFFSET = 45 // how much draw offset in slot display from top
 var SLOT_HEIGHT = IMAGE_HEIGHT + IMAGE_TOP_MARGIN + IMAGE_BOTTOM_MARGIN; // how many pixels one slot image takes
+
 var JSON_PATH = 'https://tiagodeluna.github.io/games/src/images.json';
 
 
@@ -40,6 +49,7 @@ var Game = {
     currentHeight:  null,
     canvas: null,
     ctx:  null,
+    slotOffset: null,
     resetOffset: null,
     // The elements in the slot machine
     elements: [],
@@ -100,7 +110,7 @@ var Game = {
         preloadImages(JSON_PATH, function() {
             Game.elements = IMAGES.slice(0);
             shuffleArray(Game.elements);
-            Game.resetOffset =  (IMAGES.length + 3) * SLOT_HEIGHT + REEL_TOP_MARGIN;
+            Game.resetOffset = (IMAGES.length + 3) * SLOT_HEIGHT;// + REEL_TOP_MARGIN;
 
             // Fill select element with symbols
             prepareSymbolsForSelection();
@@ -111,38 +121,152 @@ var Game = {
     },
 
     // this is where all entities will be moved
-    // and checked for collisions, etc.
+    // and checked for collisions
     update: function() {
         var checkCollision = false;
 
-        console.log('UPDATE!');
-
-        if (Game.Input.tapped) {
-            Game.Input.tapped = false;
+        if (this.Input.tapped && this.status == GameStatus.NOT_STARTED) {
+            this.Input.tapped = false;
             checkCollision = true;
         }
 
         // Checks collision
-        if (checkCollision && Game.collides(Game.Button, {x: Game.Input.x, y: Game.Input.y, r: 7}) ) {
-                console.log('Colision!');
-                Game.status = GameStatus.SYMBOL_SELECTION;
-                checkCollision = false;
+        if (checkCollision && Game.collides(this.Button, {x: this.Input.x, y: this.Input.y, r: 7}) ) {
+            console.log('Colision!');
+            this.status = GameStatus.SYMBOL_SELECTION;
+            checkCollision = false;
+        }
+
+        var now = new Date();
+        var that = this;
+
+        // Check slot status and if spun long enough stop it on result
+        function _check_slot(offset, result) {
+
+            var resultPos1 = offset + (result+1) * SLOT_HEIGHT;
+            var resultPos2 = offset + (that.elements.length*SLOT_HEIGHT) + (result+1)*SLOT_HEIGHT;
+            var minimum = 2 * SLOT_HEIGHT + REEL_TOP_MARGIN - LOW_SPEED;
+            var maximum = 2 * SLOT_HEIGHT + REEL_TOP_MARGIN + LOW_SPEED;
+            
+            console.log('Result pos = '+resultPos1+' and '+resultPos2);
+
+            if ((resultPos1 >= minimum && resultPos1 <= maximum)
+                || (resultPos2 >= minimum && resultPos2 <= maximum)) {
+                return true;
             }
+
+/*
+            if (now - that.lastUpdate > SPINTIME) {
+                var c = parseInt(Math.abs(offset / SLOT_HEIGHT)) % that.elements.length;
+                //console.log('Math.abs( '+offset+' / '+SLOT_HEIGHT+') % '+that.elements.length+' = '+c);
+                if ( c == result ) {
+                    if ( result == 0 ) {
+                        if ( Math.abs((offset-SLOT_HEIGHT) + (that.elements.length * SLOT_HEIGHT)) < (that.speed * 1.5)) {
+                            return true; // done
+                        }
+                    } else if ( Math.abs(offset + (result * SLOT_HEIGHT)) < (that.speed * 1.5)) {
+                            console.log('caso 2: offset + result * SLOT_HEIGHT < speed * 1.5');
+                            console.log(offset+' + ('+result+' * '+SLOT_HEIGHT+')) = '+Math.abs(offset + (result * SLOT_HEIGHT)));
+                            console.log('('+that.speed+' * 1.5) = '+that.speed * 1.5);
+                        return true; // done
+                    }
+                }
+            }
+            */
+            return false;
+        }
+
+        // Control the spinnig slots steps
+        switch (this.status) {
+            case GameStatus.SWITCH_PHASE_SPINNING:
+//                console.log('1 - Spinning!')
+                if (now - this.lastUpdate > RUNTIME) {
+                    this.status = GameStatus.SWITCH_PHASE_STOPPING;
+                    this.lastUpdate = now;
+                    this.speed = LOW_SPEED;
+                }
+                break;
+            case GameStatus.SWITCH_PHASE_STOPPING:
+                this.stopped = _check_slot(this.slotOffset, this.result);
+//                console.log('2 - Stopping.');
+                if (this.stopped) {
+                    this.speed = 0;
+                    this.status = GameStatus.SWITCH_PHASE_STOPPED;
+                    this.lastUpdate = now;
+                }
+                break;
+            case GameStatus.SWITCH_PHASE_STOPPED:
+//                console.log('3 - Stopped...');
+                this.status = GameStatus.CALCULATING_RESULT;
+//TODO: Play sound (?)
+                this.lastUpdate = now;
+                break;
+            case GameStatus.CALCULATING_RESULT:
+                console.log('Calculating result...');
+
+                // Wait for a while before showing the result
+                if (now - this.lastUpdate > 1000) {
+                    console.log('Choose: '+ that.selectedSymbol.name+'; Result: '+that.elements[that.result].name+'('+this.result+')')
+                    if (that.elements[that.result].id == that.selectedSymbol.id) {
+                        Game.status = GameStatus.RESULT_WON;
+                    }
+                    else {
+                        Game.status = GameStatus.RESULT_LOST;
+                    }
+                    console.log('Result is............');
+                }
+                break;
+            case GameStatus.RESULT_WON: // End with victory
+                console.log('WON!!!');
+                break;
+            case GameStatus.RESULT_LOST: // End with loss
+                console.log('LOST...');
+                break;
+            default:
+        }
+        Game.lastupdate = now;
     },
 
-    // this is where we draw all the entities
+    // This is where we draw all the entities
     render: function() {
+
+        if (Game.status === GameStatus.SYMBOL_SELECTION) {
+            var selectionBox = document.getElementById('selection-box');
+            selectionBox.style.display = 'block';
+        }
+
+        // draw the spinning slots based on current state
+        // Enter here if stopped = TRUE or speed > 0
+//        if (this.stopped || this.speed) { // || force) {
+        if (this.speed) {
+            if (this.stopped) {
+                this.speed = 0;
+                this.slotOffset = -(this.result * SLOT_HEIGHT);
+                //this.slotOffset = -(c * SLOT_HEIGHT + REEL_TOP_MARGIN);
+
+                //if (this.slotOffset + DRAW_OFFSET > 0) {
+                if (this.slotOffset > 0) {
+                    // reset back to beginning
+                    this.slotOffset = -this.resetOffset + SLOT_HEIGHT * 3;
+                }
+
+            } else {
+                this.slotOffset += this.speed;
+                //if (this.slotOffset + DRAW_OFFSET > 0) {
+                if (this.slotOffset > 0) {
+                    // reset back to beginning
+                    //this.slotOffset = -this.resetOffset + SLOT_HEIGHT * 3 - DRAW_OFFSET;
+                    this.slotOffset = -this.resetOffset + SLOT_HEIGHT * 3;
+                }
+            }
+        }
+        
 
         if (Game.status != GameStatus.NOT_STARTED) {
             Game.Draw.clear();
 
             // Draw elements on canvas
             Game.Draw.elements(Game.elements);
-        }
-
-        if (Game.status === GameStatus.SYMBOL_SELECTION) {
-            var selectionBox = document.getElementById('selection-box');
-            selectionBox.style.display = 'block';
         }
 
         // Draw the background
@@ -199,36 +323,23 @@ var Game = {
     },
 
     restart: function() {
-        //Game.lastUpdate = new Date();
-        Game.speed1 = SLOT_SPEED;
+        Game.lastUpdate = new Date();
+        Game.speed = HIGH_SPEED;
 
-        // function locates id from items
-        function _find(items, id) {
-            for ( var i=0; i < items.length; i++ ) {
-                if ( items[i].id == id ) return i;
-            }
-        }
+        console.log('RESTART!');
 
-        // uncomment to get always jackpot
-        //this.result1 = _find( this.items1, 'gold-64' );
-        //this.result2 = _find( this.items2, 'gold-64' );
-        //this.result3 = _find( this.items3, 'gold-64' );
+        // get random result
+        Game.result = parseInt(Math.random() * Game.elements.length)
+        console.log('Resuls is '+ Game.elements[Game.result].name);
 
-        // get random results
-        Game.result1 = parseInt(Math.random() * Game.elements.length)
-
-        // Clear stop locations
-        Game.stopped1 = false;
-
-//TODO: PAREI AQUI!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         // randomize reel locations
-        this.offset1 = -parseInt(Math.random( ITEM_COUNT )) * SLOT_HEIGHT;
-        this.offset2 = -parseInt(Math.random( ITEM_COUNT )) * SLOT_HEIGHT;
-        this.offset3 = -parseInt(Math.random( ITEM_COUNT )) * SLOT_HEIGHT;
+        //this.slotOffset = -parseInt(Math.random( Game.elements.length )) * SLOT_HEIGHT;
+        this.slotOffset = 0;
+        Game.stopped = false;
 
-        $('#results').hide();
+        //$('#results').hide();
 
-        this.state = 1;
+        this.status = GameStatus.SWITCH_PHASE_SPINNING;
     }
 
 };
@@ -236,25 +347,8 @@ var Game = {
 // this function checks if two circles overlap
 Game.collides = function(a, b) {
 
-    /*
-    var distance_squared = ( ((a.x - b.x) * (a.x - b.x)) + 
-                            ((a.y - b.y) * (a.y - b.y)));
-
-
-    var radii_squared = (a.r + b.r) * (a.r + b.r);
-
-    if (distance_squared < radii_squared) {
-        return true;
-    } else {
-        return false;
-    }
-    */
-
-    console.log('Button: x='+Game.Button.x+', y='+Game.Button.y);
-    console.log('Input: x='+Game.Input.x+', y='+Game.Input.y);
-
     if (b.x >= a.x && b.x <= (a.x+a.WIDTH)
-        && b.y >= a.y && b.y <= (a.y+a.WIDTH)) {
+        && b.y >= a.y && b.y <= (a.y+a.HEIGHT)) {
         return true;
     } else {
         return false;
@@ -286,8 +380,6 @@ Game.Button = {
     img: null,
 
     create: function() {
-        console.log('Drawing button!')
-
         this.x = Game.WIDTH/2 - this.WIDTH/2;
         this.y = Game.HEIGHT/2 - this.HEIGHT/2;
 
@@ -355,12 +447,10 @@ Game.Draw = {
         Game.ctx.shadowOffsetY = 5;
         Game.ctx.shadowBlur = 5;
 
-        console.log('Drawing elements!');
-
         for (var i = 0 ; i < items.length ; i++) {
             var asset = items[i];
-            Game.ctx.drawImage(asset.img, REEL_LEFT_MARGIN, i * SLOT_HEIGHT + REEL_TOP_MARGIN, IMAGE_WIDTH, IMAGE_HEIGHT);
-            Game.ctx.drawImage(asset.img, REEL_LEFT_MARGIN, (i + items.length) * SLOT_HEIGHT + REEL_TOP_MARGIN, IMAGE_WIDTH, IMAGE_HEIGHT);
+            Game.ctx.drawImage(asset.img, REEL_LEFT_MARGIN, i * SLOT_HEIGHT + REEL_TOP_MARGIN + Game.slotOffset, IMAGE_WIDTH, IMAGE_HEIGHT);
+            Game.ctx.drawImage(asset.img, REEL_LEFT_MARGIN, (i + items.length) * SLOT_HEIGHT + REEL_TOP_MARGIN + Game.slotOffset, IMAGE_WIDTH, IMAGE_HEIGHT);
         }
 
         Game.ctx.restore();
@@ -469,6 +559,12 @@ function selectSymbol() {
         symbolElement.src = Game.selectedSymbol.path+Game.selectedSymbol.file;
         symbolElement.style.display = 'block';
 //TODO: Enable Spin button
+
+//TODO: Temp, remove it!
+        var selectionBox = document.getElementById('selection-box');
+        selectionBox.style.display = 'none';
+
+        Game.restart();
     } else {
         // Hide image element if no symbol was chosen
         symbolElement.style.display = 'none';
@@ -477,7 +573,6 @@ function selectSymbol() {
 
 // Hide loading screen and show Canvas
 function displayCanvas() {
-    console.log('Showing canvas!');
 /*
     var loading = document.getElementById('game-container');
 //    loading.remove();

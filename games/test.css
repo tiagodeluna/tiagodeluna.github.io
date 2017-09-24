@@ -128,6 +128,11 @@ a#tweet {
 	text-decoration: none;
 	margin: 0 auto; 
 }
+
+#info2 {
+	top: 100%;
+	padding : 0;
+}
 */
 #loading {
 	color: white;
@@ -137,12 +142,6 @@ a#tweet {
 	margin: 0 auto; 
 	text-decoration: none;
 	top: 50%;
-}
-
-
-#info2 {
-	top: 100%;
-	padding : 0;
 }
 
 #selection-box {
@@ -155,20 +154,20 @@ a#tweet {
     background: white;
     left: 50%;
     top: 50%;
-    height: 320px;
+    height: 260px;
     width: 320px;
     margin-left: -185px;
     margin-top: -180px;
-    padding: 20px 10px;
+    padding: 15px 10px;
     text-align: center;
 }
 #selection-box p, #symbol-select {
 	color: #000;
-	font-size: 36px;
+	font-size: 30px;
 	font-family: 'Chewy', cursive;
 }
-#symbol-display, #symbol-select {
-	margin-top: 30px;
+#symbol-select, #symbol-display {
+	margin-top: 15px;
 }
 #symbol-display {
     display: block;
@@ -180,7 +179,7 @@ a#tweet {
     margin-left: -120px;
     margin-top: -50px;
     border-color: green;
-    border-radius: 20px;
+    border-radius: 21px;
     border-style: solid;
     border-width: 5px;
 }
