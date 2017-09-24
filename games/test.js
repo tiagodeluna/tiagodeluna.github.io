@@ -99,6 +99,7 @@ var Game = {
             e.preventDefault();
             Game.Input.set(e.touches[0]);
         }, false);
+        /*
         window.addEventListener('touchmove', function(e) {
             // We're just preventing default behaviour
             //  so the screen doesn't scroll or zoom
@@ -108,7 +109,7 @@ var Game = {
             // as above
             e.preventDefault();
         }, false);
-
+        */
         // Load assets and predraw the reel
         preloadImages(JSON_PATH, function() {
             Game.elements = IMAGES.slice(0);
