@@ -166,9 +166,16 @@ a#tweet {
 	font-size: 30px;
 	font-family: 'Chewy', cursive;
 }
-#symbol-select, #symbol-display {
+#selection-box img {
+	height: 110px;
+	width: 110px;
+	margin-top: 35px;
+
+}
+#symbol-select {
 	margin-top: 15px;
 }
+/*
 #symbol-display {
     display: block;
     position: absolute;
@@ -189,7 +196,6 @@ a#tweet {
     width: 235px;
 }
 
-/*
 #selection-box #score {
     margin: 5px;
 }

@@ -5,12 +5,13 @@ var IMAGES = [];
 var GameStatus = {
   NOT_STARTED: 1,
   SYMBOL_SELECTION: 2,
-  SWITCH_PHASE_SPINNING: 3,
-  SWITCH_PHASE_STOPPING: 4,
-  SWITCH_PHASE_STOPPED: 5,
-  CALCULATING_RESULT: 6,
-  RESULT_WON: 7,
-  RESULT_LOST: 8
+  SYMBOL_SELECTED: 3,
+  SWITCH_PHASE_SPINNING: 4,
+  SWITCH_PHASE_STOPPING: 5,
+  SWITCH_PHASE_STOPPED: 6,
+  CALCULATING_RESULT: 7,
+  RESULT_WON: 8,
+  RESULT_LOST: 9
 };
 
 var IMAGE_HEIGHT = 155;
@@ -27,6 +28,8 @@ var DRAW_OFFSET = 45 // how much draw offset in slot display from top
 var SLOT_HEIGHT = IMAGE_HEIGHT + IMAGE_TOP_MARGIN + IMAGE_BOTTOM_MARGIN; // how many pixels one slot image takes
 
 var JSON_PATH = 'https://tiagodeluna.github.io/games/src/images.json';
+var SPIN_BTN_ON = 'img/BTN_Spin.png';
+var SPIN_BTN_OFF = 'img/BTN_Spin_d.png';
 
 
 /*---------------------------------------------------*/
@@ -53,8 +56,8 @@ var Game = {
     resetOffset: null,
     // The elements in the slot machine
     elements: [],
-    startBtn: null,
     selectedSymbol: null,
+    startBtn: null,
 
     init: function(callback) {
 
@@ -376,7 +379,7 @@ Game.Button = {
     HEIGHT: 96,
     x: 0,
     y: 0,
-    src: 'img/start-button.png',
+    src: 'img/BTN_start.png',
     img: null,
 
     create: function() {
@@ -552,22 +555,25 @@ function selectSymbol() {
     // Store selected symbol
     Game.selectedSymbol = IMAGES.find(_symbolById);
 
-    var symbolElement = document.getElementById('symbol-img');
+    var spinButton = document.getElementById('spin-button');
 
     if (Game.selectedSymbol != null) {
-        // Show selected image
-        symbolElement.src = Game.selectedSymbol.path+Game.selectedSymbol.file;
-        symbolElement.style.display = 'block';
-//TODO: Enable Spin button
+        // Enable Spin button
+        spinButton.src = SPIN_BTN_ON;
+        Game.status = GameStatus.SYMBOL_SELECTED;
+    } else {
+        spinButton.src = SPIN_BTN_OFF;
+        Game.status = GameStatus.SYMBOL_SELECTION;
+    }
+}
 
-//TODO: Temp, remove it!
+function startSpinning() {
+//TODO: Add other valid status
+    if (Game.status == GameStatus.SYMBOL_SELECTED) {
         var selectionBox = document.getElementById('selection-box');
         selectionBox.style.display = 'none';
 
         Game.restart();
-    } else {
-        // Hide image element if no symbol was chosen
-        symbolElement.style.display = 'none';
     }
 }
 
