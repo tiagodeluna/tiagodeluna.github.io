@@ -20,8 +20,8 @@ var IMAGE_TOP_MARGIN = 12;
 var IMAGE_BOTTOM_MARGIN = 12;
 var REEL_LEFT_MARGIN = 310;
 var REEL_TOP_MARGIN = 12;
-var RUNTIME = 3000; // how long all slots spin before starting countdown
-var SPINTIME = 1000; // how long the slot spins at minimum
+var SPIN_TIME = 3000; // how long all slots spin before starting countdown
+var WAIT_TIME = 1000; // how long the slot spins at minimum
 var HIGH_SPEED = 15;//15 // how many pixels per second slots roll
 var LOW_SPEED = 5;
 var DRAW_OFFSET = 45 // how much draw offset in slot display from top
@@ -38,10 +38,11 @@ var SPIN_BTN_OFF = 'img/BTN_Spin_d.png';
 
 var Game = {
     // Set up some initial values
-    WIDTH: 960,//480
-    HEIGHT:  536,//268
+    WIDTH: 960,
+    HEIGHT:  536,
     scale:  1,
     status: GameStatus.NOT_STARTED,
+    stopped: true,
     // the position of the canvas
     // in relation to the screen
     offset: {top: 0, left: 0},
@@ -54,16 +55,14 @@ var Game = {
     ctx:  null,
     slotOffset: null,
     resetOffset: null,
-    // The elements in the slot machine
-    elements: [],
+    elements: [], // The elements in the slot machine
     selectedSymbol: null,
-    startBtn: null,
 
     init: function(callback) {
 
-        // the proportion of width to height
+        // The proportion of width to height
         Game.RATIO = Game.WIDTH / Game.HEIGHT;
-        // these will change when the screen is resized
+        // These will change when the screen is resized
         Game.currentWidth = Game.WIDTH;
         Game.currentHeight = Game.HEIGHT;
         // this is our canvas element
@@ -72,22 +71,21 @@ var Game = {
 
         // setting this is important
         // otherwise the browser will
-        // default to 320 x 200
+        // set the default values
         Game.canvas.width = Game.WIDTH;
         Game.canvas.height = Game.HEIGHT;
-        // the canvas context enables us to 
-        // interact with the canvas api
+
         Game.ctx = Game.canvas.getContext('2d');
 
         // we need to sniff out Android and iOS
         // so that we can hide the address bar in
         // our resize function
 //TODO: TESTAR O IMPACTO DESSE CODIGO (OU DA AUSENCIA DELE) NO CELULAR
-        Game.ua = navigator.userAgent.toLowerCase();
+/*        Game.ua = navigator.userAgent.toLowerCase();
         Game.android = Game.ua.indexOf('android') > -1 ? true : false;
         Game.ios = ( Game.ua.indexOf('iphone') > -1 || Game.ua.indexOf('ipad') > -1  ) ? 
             true : false;
-
+*/
         // Listen for clicks
         window.addEventListener('click', function(e) {
             e.preventDefault();
@@ -118,6 +116,9 @@ var Game = {
 
             // Fill select element with symbols
             prepareSymbolsForSelection();
+
+//TODO: Draw background
+            //Game.Draw.image('img/BG.png',0,0,Game.WIDTH,Game.HEIGHT);
 
             // Display the scores in the main update function
             Game.Draw.title('Wild Fruits', 100, 80, '#fff');
@@ -166,32 +167,13 @@ var Game = {
                 return true;
             }
 
-/*
-            if (now - that.lastUpdate > SPINTIME) {
-                var c = parseInt(Math.abs(offset / SLOT_HEIGHT)) % that.elements.length;
-                //console.log('Math.abs( '+offset+' / '+SLOT_HEIGHT+') % '+that.elements.length+' = '+c);
-                if ( c == result ) {
-                    if ( result == 0 ) {
-                        if ( Math.abs((offset-SLOT_HEIGHT) + (that.elements.length * SLOT_HEIGHT)) < (that.speed * 1.5)) {
-                            return true; // done
-                        }
-                    } else if ( Math.abs(offset + (result * SLOT_HEIGHT)) < (that.speed * 1.5)) {
-                            console.log('caso 2: offset + result * SLOT_HEIGHT < speed * 1.5');
-                            console.log(offset+' + ('+result+' * '+SLOT_HEIGHT+')) = '+Math.abs(offset + (result * SLOT_HEIGHT)));
-                            console.log('('+that.speed+' * 1.5) = '+that.speed * 1.5);
-                        return true; // done
-                    }
-                }
-            }
-            */
             return false;
         }
 
         // Control the spinnig slots steps
         switch (this.status) {
             case GameStatus.SWITCH_PHASE_SPINNING:
-//                console.log('1 - Spinning!')
-                if (now - this.lastUpdate > RUNTIME) {
+                if (now - this.lastUpdate > SPIN_TIME) {
                     this.status = GameStatus.SWITCH_PHASE_STOPPING;
                     this.lastUpdate = now;
                     this.speed = LOW_SPEED;
@@ -199,7 +181,6 @@ var Game = {
                 break;
             case GameStatus.SWITCH_PHASE_STOPPING:
                 this.stopped = _check_slot(this.slotOffset, this.result);
-//                console.log('2 - Stopping.');
                 if (this.stopped) {
                     this.speed = 0;
                     this.status = GameStatus.SWITCH_PHASE_STOPPED;
@@ -207,31 +188,28 @@ var Game = {
                 }
                 break;
             case GameStatus.SWITCH_PHASE_STOPPED:
-//                console.log('3 - Stopped...');
                 this.status = GameStatus.CALCULATING_RESULT;
 //TODO: Play sound (?)
                 this.lastUpdate = now;
                 break;
             case GameStatus.CALCULATING_RESULT:
-                console.log('Calculating result...');
-
                 // Wait for a while before showing the result
-                if (now - this.lastUpdate > 1000) {
-                    console.log('Choose: '+ that.selectedSymbol.name+'; Result: '+that.elements[that.result].name+'('+this.result+')')
-                    if (that.elements[that.result].id == that.selectedSymbol.id) {
-                        Game.status = GameStatus.RESULT_WON;
-                    }
-                    else {
-                        Game.status = GameStatus.RESULT_LOST;
-                    }
-                    console.log('Result is............');
+                if (now - this.lastUpdate > WAIT_TIME) {
+                    
+                    console.log('Choose: '+ that.selectedSymbol.name+'; Result: '+that.elements[that.result].name+'('+this.result+')');
+                    
+                    Game.status = that.elements[that.result].id == that.selectedSymbol.id ?
+                        GameStatus.RESULT_WON :
+                        GameStatus.RESULT_LOST;
+
+                    this.lastUpdate = now;
                 }
                 break;
             case GameStatus.RESULT_WON: // End with victory
-                console.log('WON!!!');
-                break;
             case GameStatus.RESULT_LOST: // End with loss
-                console.log('LOST...');
+                if (now - this.lastUpdate > WAIT_TIME*3) {
+                    Game.status = GameStatus.SYMBOL_SELECTED;
+                }
                 break;
             default:
         }
@@ -241,47 +219,37 @@ var Game = {
     // This is where we draw all the entities
     render: function() {
 
-        if (Game.status === GameStatus.SYMBOL_SELECTION) {
+        if (Game.status === GameStatus.SYMBOL_SELECTION
+            || Game.status === GameStatus.SYMBOL_SELECTED) {
             var selectionBox = document.getElementById('selection-box');
             selectionBox.style.display = 'block';
         }
 
-        // draw the spinning slots based on current state
-        // Enter here if stopped = TRUE or speed > 0
-//        if (this.stopped || this.speed) { // || force) {
-        if (this.speed) {
-            if (this.stopped) {
-                this.speed = 0;
-                this.slotOffset = -(this.result * SLOT_HEIGHT);
-                //this.slotOffset = -(c * SLOT_HEIGHT + REEL_TOP_MARGIN);
-
-                //if (this.slotOffset + DRAW_OFFSET > 0) {
-                if (this.slotOffset > 0) {
-                    // reset back to beginning
-                    this.slotOffset = -this.resetOffset + SLOT_HEIGHT * 3;
-                }
-
-            } else {
-                this.slotOffset += this.speed;
-                //if (this.slotOffset + DRAW_OFFSET > 0) {
-                if (this.slotOffset > 0) {
-                    // reset back to beginning
-                    //this.slotOffset = -this.resetOffset + SLOT_HEIGHT * 3 - DRAW_OFFSET;
-                    this.slotOffset = -this.resetOffset + SLOT_HEIGHT * 3;
-                }
+        // Adjust the spinning slots based on current state
+        if (!this.stopped) {
+            this.slotOffset += this.speed;
+            if (this.slotOffset > 0) {
+                // reset back to beginning
+                this.slotOffset = -this.resetOffset + SLOT_HEIGHT * 3;
             }
         }
         
-
         if (Game.status != GameStatus.NOT_STARTED) {
             Game.Draw.clear();
+
+            //"Static" UI elements
+            Game.Draw.text('Your symbol:', 810, 190, 26, '#fff');
 
             // Draw elements on canvas
             Game.Draw.elements(Game.elements);
         }
 
-        // Draw the background
-        //Game.Draw.image('img/BG.png',0,0,Game.WIDTH,Game.HEIGHT);
+        if (Game.status === GameStatus.RESULT_LOST) {
+            Game.Draw.centeredText('You lost', 300, 150, 'red');
+        }
+        else if (Game.status === GameStatus.RESULT_WON) {
+            Game.Draw.centeredText('You Won!', 300, 150, 'green');
+        }
     },
 
     // the actual loop
@@ -307,10 +275,10 @@ var Game = {
         // page, enabling us to scroll past
         // the address bar, thus hiding it.
 //TODO: TESTAR O IMPACTO DESSE CODIGO (OU DA AUSENCIA DELE) NO CELULAR
-        if (Game.android || Game.ios) {
+/*        if (Game.android || Game.ios) {
             document.body.style.height = (window.innerHeight + 50) + 'px';
         }
-
+*/
         // set the new canvas style width and height
         // note: our canvas is still 320 x 480, but
         // we're essentially scaling it with CSS
@@ -421,9 +389,19 @@ Game.Draw = {
     },
 
     text: function(string, x, y, size, color) {
-        Game.ctx.font = 'bold '+size+'px Chewy';
+        Game.ctx.font = size+'px Chewy';
         Game.ctx.fillStyle = color;
         Game.ctx.fillText(string, x, y);
+    },
+
+    centeredText: function(string, y, size, color) {
+        Game.ctx.font = size+'px Chewy';
+        Game.ctx.fillStyle = color;
+
+        // Get the width of the text to draw
+        var textWidth = Game.ctx.measureText(string).width;
+
+        Game.ctx.fillText(string, (Game.WIDTH/2) - (textWidth/2), y);
     },
 
     title: function(string, y, size, color) {
