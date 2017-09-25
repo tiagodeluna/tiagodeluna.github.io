@@ -177,7 +177,7 @@ var Game = {
                 break;
             case GameStatus.SWITCH_PHASE_STOPPED:
                 this.status = GameStatus.CALCULATING_RESULT;
-//TODO: Play sound (?)
+//TODO: Play sound
                 this.lastUpdate = now;
                 break;
             case GameStatus.CALCULATING_RESULT:
