@@ -37,7 +37,6 @@ body, #game-container {
 	right: 0;
 	background-color: #2D373D;
 
-	/*overflow: hidden;*/
     width: 100%;
     height: 100%;
     display:block;
@@ -64,14 +63,12 @@ body, #game-container {
 	position: absolute;
 	top: 0;
 	left: 0;
-	/*background-color: #2D373D;*/
 	width: 100%;
 	height: 100%;
 }
 
 h1, p, a {
 	position: relative;
-	/*z-index: 1; */
 	font-family: 'Chewy', cursive;
 	color: white;
 	text-align: center;
@@ -80,60 +77,6 @@ h1, p, a {
 h1 {
 	font-size : 48px;
 }
-/*
-p {
-	font-size: 20px;
-	margin-top: 10px;
-	padding-left: 200px;
-}
-a{
-	font-size : 16px;
-	color: #10C198;
-	margin: 0;
-	display: inline-block;
-	position: relative;
-	left: 0;
-}
-a:hover {
-	color: #0da582;
-}
-
-a#start {
-	font-size: 30px;
-	/*display: block;* /
-	display: none;
-	width: 145px;
-	top: 30%;
-	left: 0; 
-	border-top: 5px solid white;
-	border-bottom: 5px solid white;
-	color: white;
-	padding: 10px;
-	text-decoration: none;
-	margin: 0 auto; 
-}
-a#start:hover {
-	color: #10C198;
-	border-top: 5px solid #10C198;
-	border-bottom: 5px solid #10C198;
-}
-
-a#tweet {
-	font-size: 18px;
-	/*display: block;* /
-	display: none;
-	top: 100%;
-	left: 0; 
-	padding: 10px;
-	text-decoration: none;
-	margin: 0 auto; 
-}
-
-#info2 {
-	top: 100%;
-	padding : 0;
-}
-*/
 #loading {
 	color: white;
 	display: block;
@@ -175,32 +118,3 @@ a#tweet {
 #symbol-select {
 	margin-top: 15px;
 }
-/*
-#symbol-display {
-    display: block;
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    height: 155px;
-    width: 235px;
-    margin-left: -120px;
-    margin-top: -50px;
-    border-color: green;
-    border-radius: 21px;
-    border-style: solid;
-    border-width: 5px;
-}
-#symbol-display img {
-	display: none;
-    height: 155px;
-    width: 235px;
-}
-
-#selection-box #score {
-    margin: 5px;
-}
-
-#selection-box #score img {
-    vertical-align: middle;
-}
-*/

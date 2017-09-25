@@ -77,15 +77,6 @@ var Game = {
 
         Game.ctx = Game.canvas.getContext('2d');
 
-        // we need to sniff out Android and iOS
-        // so that we can hide the address bar in
-        // our resize function
-//TODO: TESTAR O IMPACTO DESSE CODIGO (OU DA AUSENCIA DELE) NO CELULAR
-/*        Game.ua = navigator.userAgent.toLowerCase();
-        Game.android = Game.ua.indexOf('android') > -1 ? true : false;
-        Game.ios = ( Game.ua.indexOf('iphone') > -1 || Game.ua.indexOf('ipad') > -1  ) ? 
-            true : false;
-*/
         // Listen for clicks
         window.addEventListener('click', function(e) {
             e.preventDefault();
@@ -117,12 +108,9 @@ var Game = {
             // Fill select element with symbols
             prepareSymbolsForSelection();
 
-//TODO: Draw background
-            //Game.Draw.image('img/BG.png',0,0,Game.WIDTH,Game.HEIGHT);
-
             // Display the scores in the main update function
-            Game.Draw.title('Wild Fruits', 100, 80, '#fff');
-//TODO: Draw "by Tiago Luna" with link to my portfolio
+            Game.Draw.text('Wild Fruits', {'y': 100}, 80, '#fff', false, true);
+            Game.Draw.text('by Tiago Luna', {'y': 135}, 26, '#000a3c', false, true);
 
             // Create start button
             Game.Button.create();
@@ -237,18 +225,30 @@ var Game = {
         if (Game.status != GameStatus.NOT_STARTED) {
             Game.Draw.clear();
 
-            //"Static" UI elements
-            Game.Draw.text('Your symbol:', 810, 190, 26, '#fff');
+            //"Static" UI text
+            Game.Draw.text('Your symbol:', {'x': 812, 'y': 195}, 24, '#fff', false, false);
+
+            if (Game.selectedSymbol != null) {
+                Game.Draw.image(Game.selectedSymbol.path+Game.selectedSymbol.file, 812, 226, 117, 77);
+            }
 
             // Draw elements on canvas
             Game.Draw.elements(Game.elements);
         }
 
+        if (Game.status === GameStatus.CALCULATING_RESULT
+            || Game.status === GameStatus.RESULT_LOST
+            || Game.status === GameStatus.RESULT_WON) {
+            Game.Draw.triangles();
+        }
+        //Show result messages
         if (Game.status === GameStatus.RESULT_LOST) {
-            Game.Draw.centeredText('You lost', 300, 150, 'red');
+            Game.Draw.text('You lost', {'y': 300}, 150, 'red', true, true);
+            Game.Draw.text('Try again =]', {'y': 400}, 60, 'red', true, true);
         }
         else if (Game.status === GameStatus.RESULT_WON) {
-            Game.Draw.centeredText('You Won!', 300, 150, 'green');
+            Game.Draw.text('You Won!', {'y': 300}, 150, 'green', true, true);
+            Game.Draw.text('Yay! =D', {'y': 400}, 60, 'green', true, true);
         }
     },
 
@@ -267,35 +267,20 @@ var Game = {
     resize: function() {
 
         Game.currentHeight = window.innerHeight;
-        // resize the width in proportion
-        // to the new height
+        // Resize the width in proportion to the new height
         Game.currentWidth = Game.currentHeight * Game.RATIO;
 
-        // this will create some extra space on the
-        // page, enabling us to scroll past
-        // the address bar, thus hiding it.
-//TODO: TESTAR O IMPACTO DESSE CODIGO (OU DA AUSENCIA DELE) NO CELULAR
-/*        if (Game.android || Game.ios) {
-            document.body.style.height = (window.innerHeight + 50) + 'px';
-        }
-*/
-        // set the new canvas style width and height
-        // note: our canvas is still 320 x 480, but
+        // Set the new canvas style width and height
         // we're essentially scaling it with CSS
         Game.canvas.style.width = Game.currentWidth + 'px';
         Game.canvas.style.height = Game.currentHeight + 'px';
-
-        // The amount by which the css resized canvas
-        // is different to the actual (480x320) size.
         Game.scale = Game.currentWidth / Game.WIDTH;
-        // Position of canvas in relation to
-        // the screen
+        // Position of canvas in relation to the screen
         Game.offset.top = Game.canvas.offsetTop;
         Game.offset.left = Game.canvas.offsetLeft;
 
-        // we use a timeout here because some mobile
-        // browsers don't fire if there is not
-        // a short delay
+        // We use a timeout here because some mobile browsers
+        //  don't fire if there is not a short delay
         window.setTimeout(function() {
                 window.scrollTo(0,1);
         }, 1);
@@ -311,12 +296,9 @@ var Game = {
         Game.result = parseInt(Math.random() * Game.elements.length)
         console.log('Resuls is '+ Game.elements[Game.result].name);
 
-        // randomize reel locations
-        //this.slotOffset = -parseInt(Math.random( Game.elements.length )) * SLOT_HEIGHT;
+        // Initial reel location
         this.slotOffset = 0;
         Game.stopped = false;
-
-        //$('#results').hide();
 
         this.status = GameStatus.SWITCH_PHASE_SPINNING;
     }
@@ -363,7 +345,7 @@ Game.Button = {
         this.y = Game.HEIGHT/2 - this.HEIGHT/2;
 
         //Draw Start Button
-        Game.Draw.image(this.src, this.x, this.y, this.WIDTH, this.HEIGHT);
+        Game.Draw.button(this.src, this.x, this.y, this.WIDTH, this.HEIGHT);
     },
 };
 
@@ -375,11 +357,6 @@ Game.Draw = {
         Game.ctx.clearRect(0, 0, Game.WIDTH, Game.HEIGHT);
     },
 
-    rect: function(x, y, w, h, color) {
-        Game.ctx.fillStyle = color;
-        Game.ctx.fillRect(x, y, w, h);
-    },
-
     circle: function(x, y, r, col) {
         Game.ctx.fillStyle = col;
         Game.ctx.beginPath();
@@ -388,33 +365,37 @@ Game.Draw = {
         Game.ctx.fill();
     },
 
-    text: function(string, x, y, size, color) {
-        Game.ctx.font = size+'px Chewy';
-        Game.ctx.fillStyle = color;
-        Game.ctx.fillText(string, x, y);
-    },
-
-    centeredText: function(string, y, size, color) {
+    text: function(string, axis, size, color, bordered, centered) {
         Game.ctx.font = size+'px Chewy';
         Game.ctx.fillStyle = color;
 
-        // Get the width of the text to draw
-        var textWidth = Game.ctx.measureText(string).width;
+        Game.ctx.save();
 
-        Game.ctx.fillText(string, (Game.WIDTH/2) - (textWidth/2), y);
-    },
+        if (bordered) {
+            Game.ctx.save();
+            Game.ctx.shadowColor = '#fff';
+            Game.ctx.shadowOffsetX = 0;
+            Game.ctx.shadowOffsetY = 0;
+            Game.ctx.shadowBlur = 40;
+        }
 
-    title: function(string, y, size, color) {
-        Game.ctx.font = size+'px Chewy';
-        Game.ctx.fillStyle = color;
+        if (centered || !axis['x']) {
+            // Get the width of the text to draw
+            var textWidth = Game.ctx.measureText(string).width;
+            axis.x = (Game.WIDTH/2) - (textWidth/2);
+        }
 
-        // Get the width of the text to draw
-        var textWidth = Game.ctx.measureText(string).width;
-
-        Game.ctx.fillText(string, (Game.WIDTH/2) - (textWidth/2), y);
+        Game.ctx.fillText(string, axis.x, axis.y);
+        Game.ctx.restore();
     },
 
     image: function(path, x, y, w, h) {
+        var img = new Image();
+        img.src = path;
+        Game.ctx.drawImage(img, x, y, w, h);
+    },
+
+    button: function(path, x, y, w, h) {
         Game.Button.img = new Image();
         Game.Button.img.src = path;
 
@@ -427,6 +408,23 @@ Game.Draw = {
             Game.ctx.drawImage(Game.Button.img, x, y, w, h);
             Game.ctx.restore();
         };
+    },
+
+    triangles: function() {
+        Game.ctx.beginPath();
+        Game.ctx.fillStyle = 'gold';
+
+        // triangle 1
+        Game.ctx.moveTo(230, 230);
+        Game.ctx.lineTo(230, 330);
+        Game.ctx.lineTo(290, 280);
+        Game.ctx.fill();
+
+        // triangle 2
+        Game.ctx.moveTo(625, 230);
+        Game.ctx.lineTo(625, 330);
+        Game.ctx.lineTo(565, 280);
+        Game.ctx.fill();
     },
 
     elements: function(items) {
@@ -554,7 +552,6 @@ function selectSymbol() {
 }
 
 function startSpinning() {
-//TODO: Add other valid status
     if (Game.status == GameStatus.SYMBOL_SELECTED) {
         var selectionBox = document.getElementById('selection-box');
         selectionBox.style.display = 'none';
