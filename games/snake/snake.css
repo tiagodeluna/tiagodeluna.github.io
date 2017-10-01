@@ -1,0 +1,90 @@
+body {padding: 0; margin: 0; overflow: hidden;}
+canvas {
+	box-shadow: 0 0 20px #000;
+	margin: auto;
+	left: 0;
+	right: 0;
+}
+body {
+	background: #2D373D;
+}
+
+#snake-container {
+	position: absolute;
+	margin: auto;
+	left: 0;
+	right: 0;
+	background-color: #2D373D;
+	width: 520px;
+	height: 520px;
+}
+
+#menu {
+	position: absolute;
+	top: 0;
+	left: 0;
+	background-color: #2D373D;
+	width: 100%;
+	height: 100%;
+}
+
+#snake-container h1, p, a {
+	position: relative;  
+	z-index: 1; 
+	font: 36px "Press Start 2P", cursive;
+	color: white;
+	text-align: center;
+	margin: 30px 0 0 0;
+}
+
+p {
+	font-size: 16px;
+	margin-top: 10px;
+	padding-left: 200px;
+}
+
+a{
+	font-size : 16px; 
+	color: #10C198;
+	margin: 0;
+	display: inline-block;
+	position: relative;
+	left: 0;
+}
+a:hover {
+	color: #0da582;
+}
+
+a#start {
+	font-size: 24px;
+	display: block;
+	width: 145px;
+	top: 30%;
+	left: 0; 
+	border-top: 5px solid white;
+	border-bottom: 5px solid white;
+	color: white;
+	padding: 10px;
+	text-decoration: none;
+	margin: 0 auto; 
+}
+a#start:hover {
+	color: #10C198;
+	border-top: 5px solid #10C198;
+	border-bottom: 5px solid #10C198;
+}
+
+a#tweet {
+	font-size: 18px;
+	display: block;
+	top: 100%;
+	left: 0; 
+	padding: 10px;
+	text-decoration: none;
+	margin: 0 auto; 
+}
+
+#info2 {
+	top: 100%;
+	padding : 0;
+}
