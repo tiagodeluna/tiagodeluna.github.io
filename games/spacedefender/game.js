@@ -19,8 +19,8 @@ var POP = {
     HEIGHT:  480,//320, 
     // Add at the start of the program
     // the amount of game ticks until
-    // we spawn a bubble
-    nextBubble: 100,
+    // we spawn a Enemy
+    nextEnemy: 100,
     entities: [],
     scale:  1,
     // the position of the canvas
@@ -159,14 +159,18 @@ var POP = {
         checkCollision = false; // we only need to check for a collision
                                 // if the user tapped on this game tick
 
-        // decrease our nextBubble counter
-        POP.nextBubble -= 1;
+        // decrease our nextEnemy counter
+        POP.nextEnemy -= 1;
         // if the counter is less than zero
-        if (POP.nextBubble < 0) {
-            // put a new instance of bubble into our entities array
-            POP.entities.push(new POP.Bubble());
+        if (POP.nextEnemy < 0) {
+            if (Math.random() > 0.5) {
+                // put a new instance of Enemy into our entities array
+                POP.entities.push(new POP.FlyingSaucer());
+            } else {
+                POP.entities.push(new POP.Starship());
+            }
             // reset the counter with a random value
-            POP.nextBubble = ( Math.random() * 100 ) + 100;
+            POP.nextEnemy = ( Math.random() * 100 ) + 100;
         }
 
         // spawn a new instance of Touch
@@ -187,7 +191,7 @@ var POP = {
         for (i = 0; i < POP.entities.length; i += 1) {
             POP.entities[i].update();
 
-            if (POP.entities[i].type === 'bubble' && checkCollision) {
+            if ((POP.entities[i].type === 'flyingSaucer' || POP.entities[i].type === 'starship') && checkCollision) {
                 hit = POP.collides(POP.entities[i], 
                                     {x: POP.Input.x, y: POP.Input.y, r: 7});
                 if (hit) {
@@ -199,7 +203,7 @@ var POP = {
                             POP.entities[i].y, 
                             2, 
                             // random opacity to spice it up a bit
-                            'rgba(255,255,255,'+Math.random()*1+')'
+                            'rgba(255,69,0,'+Math.random()*1+')'
                         )); 
                     }
                     //Update number of hits
@@ -322,7 +326,11 @@ POP.collides = function(a, b) {
         var distance_squared = ( ((a.x - b.x) * (a.x - b.x)) + 
                                 ((a.y - b.y) * (a.y - b.y)));
 
-        var radii_squared = (a.r + b.r) * (a.r + b.r);
+        var radii_squared = 0;
+        if (a.type === 'flyingSaucer')
+            radii_squared = (a.r + b.r) * (a.r + b.r);
+        else
+            radii_squared = (a.h + b.r) * (a.h + b.r);
 
         if (distance_squared < radii_squared) {
             return true;
@@ -356,16 +364,16 @@ POP.Touch = function(x, y) {
 
 };
 
-POP.Bubble = function() {
+POP.FlyingSaucer = function() {
 
-    this.type = 'bubble';
-    this.r = (Math.random() * 20) + 10; // the radius of the bubble
+    this.type = 'flyingSaucer';
+    this.r = (Math.random() * 15) + 15; // the radius of the Enemy
     this.speed = (Math.random() * 3) + 1;
 
     this.x = (Math.random() * (POP.WIDTH) - this.r);
     this.y = POP.HEIGHT + (Math.random() * 100) + 100; // make sure it starts off screen
 
-    // the amount by which the bubble
+    // the amount by which the Enemy
     // will move from side to side
     this.waveSize = 5 + this.r;
     // we need to remember the original
@@ -394,22 +402,85 @@ POP.Bubble = function() {
 
     this.render = function() {
 
-        POP.Draw.circle(this.x, this.y, this.r, 'rgba(200,200,200,1)');
-
-        //Cockpit
-        POP.Draw.circle(this.x, this.y, this.r*0.5, 'rgba(150,150,150,1)');
-        //Details
-        var color = 'rgba(150,150,150,1)';
+        var colorDetails = 'rgba(150,150,150,1)';
         var radius = this.r/8;
-        var  offset2 = -3*this.r/4;
-        POP.Draw.circle(this.x - this.r, this.y, radius, color);
-        POP.Draw.circle(this.x + this.r, this.y, radius, color);
-        POP.Draw.circle(this.x, this.y - this.r, radius, color);
-        POP.Draw.circle(this.x, this.y + this.r, radius, color);
-        POP.Draw.circle(this.x - offset2, this.y - offset2, radius, color);
-        POP.Draw.circle(this.x + offset2, this.y - offset2, radius, color);
-        POP.Draw.circle(this.x + offset2, this.y + offset2, radius, color);
-        POP.Draw.circle(this.x - offset2, this.y + offset2, radius, color);
+        var  offsetDiagonal = this.r/2;
+        var  offsetHorzVert = 3*this.r/4;
+        //Main circle
+        POP.Draw.circle(this.x, this.y, this.r, 'rgba(250,250,250,1)');
+        //Cockpit
+        POP.Draw.circle(this.x, this.y, this.r*0.5, colorDetails);
+        //Small circles
+        POP.Draw.circle(this.x - offsetHorzVert, this.y, radius, colorDetails);
+        POP.Draw.circle(this.x + offsetHorzVert, this.y, radius, colorDetails);
+        POP.Draw.circle(this.x, this.y - offsetHorzVert, radius, colorDetails);
+        POP.Draw.circle(this.x, this.y + offsetHorzVert, radius, colorDetails);
+        POP.Draw.circle(this.x - offsetDiagonal, this.y - offsetDiagonal, radius, colorDetails);
+        POP.Draw.circle(this.x + offsetDiagonal, this.y - offsetDiagonal, radius, colorDetails);
+        POP.Draw.circle(this.x + offsetDiagonal, this.y + offsetDiagonal, radius, colorDetails);
+        POP.Draw.circle(this.x - offsetDiagonal, this.y + offsetDiagonal, radius, colorDetails);
+    };
+
+};
+
+POP.Starship = function() {
+
+    this.type = 'starship';
+    this.h = (Math.random() * 9) + 18; // the radius of the Enemy
+    this.speed = (Math.random() * 3) + 2;
+
+    this.x = (Math.random() * (POP.WIDTH));
+    this.y = POP.HEIGHT + (Math.random() * 100) + 100; // make sure it starts off screen
+
+    // the amount by which the Enemy
+    // will move from side to side
+    this.waveSize = 5 + this.h/2;
+    // we need to remember the original
+    // x position for our sine wave calculation
+    this.xConstant = this.x;
+
+    this.remove = false;
+
+    this.update = function() {
+
+        // a sine wave is commonly a function of time
+        var time = new Date().getTime() * 0.002;
+
+        // move up the screen by 1 pixel
+        this.y -= this.speed;
+        // the x coordinate to follow a sine wave
+        this.x = this.waveSize * Math.sin(time) + this.xConstant;
+
+        // if off screen, flag for removal
+        if (this.y < -10) {
+            POP.score.escaped += 1; // Update score
+            this.remove = true;
+        }
+
+    };
+
+    this.render = function() {
+
+        var colorDetails = 'rgba(150,150,150,1)';
+        var radius = this.r/8;
+        var offsetDiagonal = this.r/2;
+        var offsetHorzVert = 3*this.r/4;
+        //Main circle
+        POP.Draw.circle(this.x, this.y, this.r, 'rgba(250,250,250,1)');
+        //Cockpit
+        POP.Draw.circle(this.x, this.y, this.r*0.5, colorDetails);
+
+        POP.ctx.beginPath();
+        POP.ctx.fillStyle = 'gold';
+
+        // triangle
+        POP.ctx.moveTo(this.x - this.h/2, this.y);
+        POP.ctx.lineTo(this.x + this.h/2, this.y);
+        POP.ctx.lineTo(this.x, this.y - this.h);
+        POP.ctx.fill();
+        //Cockpit
+        var radius = this.h/5;
+        POP.Draw.circle(this.x - radius, this.y - this.h/2, radius, 'rgba(255,150,0,1)');
     };
 
 };
