@@ -1,0 +1,35 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="viewport" content="width=device-width, 
+	    user-scalable=no, initial-scale=1, maximum-scale=1, user-scalable=0" />
+	<meta name="robots" content="index, games"/>
+	<meta name="apple-mobile-web-app-capable" content="yes" />
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+	<title>Wild Fruits Game</title>
+
+	<link rel="shortcut icon" href="../favicon.png">
+	<link href="https://fonts.googleapis.com/css?family=Baloo+Paaji|Chewy" rel="stylesheet">
+	<link rel="stylesheet" type="text/css" href="css/game.css" />
+</head>
+<body>
+	<div id="game-container">
+		<div id="menu">
+			<p id="loading">Loading...</p>
+
+			<!-- Selection box -->
+			<div id="selection-box">
+				<select id="symbol-select">
+					<option>&lt;choose a symbol&gt;</option>
+				</select>
+				<a href="javascript: void(0)" onclick="startSpinning(); return false;"><img id="spin-button" src="img/BTN_Spin_d.png" /></a>
+			</div>
+		</div>
+	</div>
+
+	<script type="text/javascript" src="js/game.js"></script>
+</body>
+</html>

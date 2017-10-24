@@ -1,0 +1,13 @@
+{
+	"symbols": {
+		"path": "https://github.com/tiagodeluna/tiagodeluna.github.io/raw/master/games/wildfruits/img/",
+		"image": [
+			{"id": "SYM1", "file": "SYM1.png", "name": "Wild"},
+			{"id": "SYM3", "file": "SYM3.png", "name": "Strawberry"},
+			{"id": "SYM4", "file": "SYM4.png", "name": "Pineapple"},
+			{"id": "SYM5", "file": "SYM5.png", "name": "Lemon"},
+			{"id": "SYM6", "file": "SYM6.png", "name": "Watermelon"},
+			{"id": "SYM7", "file": "SYM7.png", "name": "Grape"}
+		]
+	}
+}
